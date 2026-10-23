@@ -23,7 +23,6 @@ Como parte do lab, também **diagnostiquei e corrigi uma falha no feed de vulner
 - **Rede:** adaptador em modo **Host-only**, sem saída para a internet — isolamento do laboratório
 - **Hardware:** PC com 8 GB de RAM (1 a 2 VMs por vez)
 
-> *Ajuste a tabela se o seu atacante foi Kali em vez de Debian.*
 
 ## 🔍 1. Reconhecimento com Nmap
 
