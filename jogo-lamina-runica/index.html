@@ -3023,7 +3023,26 @@ function summaryCard(title, x) {
     <dt>Renascimentos</dt><dd>${fmt(x.prestiges)}</dd>
     <dt>Salvo em</dt><dd>${esc(fmtDate(x.lastSave))}</dd></dl></div>`;
 }
+// No claude.ai o arquivo passa pelo recurso de downloads (o visualizador pede confirmação);
+// fora dele, usa o download normal do navegador.
+let dlCap;   // undefined = ainda não consultado; null = indisponível
+function claudeDownloads() {
+  if (dlCap !== undefined) return Promise.resolve(dlCap);
+  if (!window.claude || typeof window.claude.use !== 'function') { dlCap = null; return Promise.resolve(null); }
+  return window.claude.use('downloads').then(d => (dlCap = d || null), () => (dlCap = null));
+}
+if (window.claude && typeof window.claude.use === 'function') claudeDownloads();
 function downloadText(name, text) {
+  if (window.claude && typeof window.claude.use === 'function') {
+    claudeDownloads().then(d => {
+      if (!d) { toast('Aqui não é possível baixar arquivos. Use “Gerar e copiar código”.', 'bad'); return; }
+      return d.save({ filename: name, data: text }).then(() => toast('Arquivo salvo.'), e => {
+        if (e && e.code === 'declined') return;
+        toast('Não foi possível baixar o arquivo. Use “Gerar e copiar código”.', 'bad');
+      });
+    });
+    return true;
+  }
   try {
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
     const a = document.createElement('a');
