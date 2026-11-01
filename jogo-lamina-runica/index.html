@@ -110,7 +110,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .odds .h { color: var(--muted); font-weight: 900; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
 .dimStar { color: #4a4470; }
 .bar.timer > i { background: linear-gradient(90deg, var(--danger), var(--gold)); }
-#dpsTag { position: absolute; left: max(10px, env(safe-area-inset-left, 0px)); bottom: 8px; font-size: 11px; font-weight: 800; color: var(--muted); background: rgba(10,8,25,.6); padding: 4px 8px; border-radius: 8px; pointer-events: none; font-variant-numeric: tabular-nums; max-width: 62%; }
+#dpsTag { position: absolute; left: max(10px, env(safe-area-inset-left, 0px)); bottom: 8px; font-size: 11px; font-weight: 800; color: var(--muted); background: rgba(10,8,25,.6); padding: 4px 8px; border-radius: 8px; pointer-events: none; font-variant-numeric: tabular-nums; max-width: 80%; }
 #dpsTag b { color: var(--text); }
 #btnBoss { position: absolute; right: max(10px, env(safe-area-inset-right, 0px)); bottom: 8px; border: 0; border-radius: 12px; padding: 9px 14px; background: linear-gradient(180deg, #ff7d88, #c9334a); font-family: var(--f-display); font-size: 13px; box-shadow: 0 4px 0 #7a1d2c; animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(1.06); } }
@@ -1004,10 +1004,15 @@ function gainGold(g) { if (!(g > 0)) return; S.gold = addCapped(S.gold, g); S.st
 const skillActive = i => S.skills[i].until > S.clock;
 
 function zoneOf(stage) { return ZONES[Math.floor((stage - 1) / 10) % ZONES.length]; }
-function hpFor(stage) { return Math.min(1e300, 10 * Math.pow(1.5, stage - 1)); }
-function goldFor(stage) { return Math.max(1, hpFor(stage) / 6); }
+// Equilíbrio (revisado em 01/11/2026 com simulação): vida ×1,55 por estágio, ouro = vida/15.
+function hpFor(stage) { return Math.min(1e300, 10 * Math.pow(1.55, stage - 1)); }
+function goldFor(stage) { return Math.max(1, hpFor(stage) / 15); }
+const ENTRY_TIME = 0.3;      // os aliados só atacam depois que o monstro termina de entrar
+const FAST_RATIO = 10;       // aliados matam em menos de 0,1 s → avanço rápido
+const FAST_STEP = 4;         // cada vitória no avanço rápido conta 4 monstros
+function fastAdvance() { return dps(false) >= FAST_RATIO * hpFor(S.stage); }
 
-function itemMain(it) { return it ? RARITIES[it.rar].base * SLOT_DEF[it.slot].k * (1 + it.lvl / 10) * (1 + 0.1 * it.up) : 0; }
+function itemMain(it) { return it ? RARITIES[it.rar].base * SLOT_DEF[it.slot].k * (1 + it.lvl / 40) * (1 + 0.1 * it.up) : 0; }
 function eqPct(slot) { return itemMain(S.equip[slot]); }
 function secTotal(type) { let t = 0; for (const k of SLOT_KEYS) { const it = S.equip[k]; if (it && it.sec && it.sec.type === type) t += it.sec.val; } return t; }
 function dmgMult() { return (1 + 0.1 * S.essTotal) * (1 + 0.5 * art('elmo')) * (1 + eqPct('hat') / 100); }
@@ -1026,7 +1031,7 @@ function dps(withSkill = true) {
   if (withSkill && skillActive(3)) d *= skillPower(3, S.skills[3].lvl);
   return d;
 }
-function heroMult(l) { return Math.pow(1.75, Math.floor(l / 10)); }
+function heroMult(l) { return Math.pow(1.6, Math.floor(l / 10)); }
 function heroBase(l = S.hero) { return l * heroMult(l); }
 function comboMult() { return 1 + Math.min(combo.n, 100) * 0.004; }
 function tapDmg() { return (heroBase() * dmgMult() + dps() * 0.04) * (1 + 0.75 * art('brac')) * (1 + eqPct('sword') / 100); }
@@ -1299,7 +1304,8 @@ function spawn(forceBoss) {
     horns: boss || r() < 0.55, hornLen: 0.35 + r() * 0.35, spikes: r() < 0.4, sat: 55 + r() * 30,
     born: 0, hit: 0, dead: false, deathT: 0, timer: boss ? bossTime() : 0,
   };
-  if (boss) { SFX.boss(); vibrate(40); moment.boss = { t: 0, ancient }; }
+  // no avanço rápido o chefe cai em menos de 1 s: sem faixa, som e vibração de chefe (exceto o Ancestral)
+  if (boss && (ancient || !fastAdvance())) { SFX.boss(); vibrate(40); moment.boss = { t: 0, ancient }; }
   updateFoeUI(true);
 }
 
@@ -1338,10 +1344,15 @@ function killFoe() {
     S.farmKills++;
     if (S.settings.autoBoss && S.farmKills >= WAVES) { S.bossFailed = false; S.farmKills = 0; S.wave = WAVES - 1; }
   } else {
-    S.wave = Math.min(WAVES - 1, S.wave + 1);
+    let step = 1;
+    if (!f.chest && fastAdvance()) {                    // pula monstros e paga o ouro deles
+      step = Math.min(FAST_STEP, WAVES - 1 - S.wave);
+      if (step > 1) gainGold(goldFor(S.stage) * goldMult() * (step - 1));
+    }
+    S.wave = Math.min(WAVES - 1, S.wave + step);
   }
   if (f.chest) saveSoon();
-  spawnDelay = 0.4;
+  spawnDelay = 0.25;
   uiDirty = true;
 }
 
@@ -1402,7 +1413,11 @@ function catchWisp() {
    ========================================================= */
 const combo = { n: 0, t: 9 };
 function doTap(x, y, auto) {
-  if (!foe || foe.dead || spawnDelay > 0) return;
+  if (!foe || foe.dead || spawnDelay > 0) {
+    // entre um monstro e outro o toque não causa dano, mas mostra o golpe e mantém o combo
+    if (!auto) { combo.t = 0; hero.atk = 0.14; fx.slash(x, y, false); SFX.hit(); }
+    return;
+  }
   if (!auto) {
     combo.n = combo.t < 0.6 ? combo.n + 1 : 1;
     combo.t = 0;
@@ -2803,7 +2818,7 @@ function updateList() {
       const n = qtyFor(HERO_C0, HERO_G, S.hero - 1), c = heroCost(n);
       const next = Math.floor(S.hero / 10) * 10 + 10;
       title = `Kael, o Rúnico <em>Nv ${S.hero}</em>`;
-      sub = `Dano de toque: <b>${fmt(tapDmg())}</b><br>Nv ${next}: dano ×1,75`;
+      sub = `Dano de toque: <b>${fmt(tapDmg())}</b><br>Nv ${next}: dano ×1,6`;
       a = `+${n} Nv`; b = ICON.coin + fmt(c); can = S.gold >= c;
     } else if (k.startsWith('ally')) {
       const i = +k.slice(4), A = ALLIES[i], l = S.allies[i];
@@ -2941,7 +2956,7 @@ function updateHUD() {
   const gps = goldPerSec();
   setText($('#gpsTxt'), gps > 0 ? `+${fmt(gps)}/s` : '');
   setText($('#zoneTxt'), zoneOf(S.stage).name);
-  setText($('#dpsTag'), `DPS <b>${fmt(dps())}</b> · Toque <b>${fmt(tapDmg())}</b>${shownCache.total ? ` · ${shownCache.total} aliados` : ''}`);
+  setText($('#dpsTag'), `DPS <b>${fmt(dps())}</b> · Toque <b>${fmt(tapDmg())}</b>${shownCache.total ? ` · ${shownCache.total} aliados` : ''}${fastAdvance() && !S.bossFailed ? ' · <b style="color:var(--ok)">⏩ Avanço rápido</b>' : ''}`);
   let pips = '';
   for (let i = 0; i < WAVES - 1; i++) pips += `<i class="${i < S.wave ? 'on' : ''}"></i>`;
   pips += `<i class="boss ${foe && foe.boss ? 'on' : ''}"></i>`;
@@ -3486,7 +3501,7 @@ function step(dt) {
   foe.born += dt;
   if (foe.hit > 0) foe.hit -= dt;
 
-  const d = dps();
+  const d = foe.born >= ENTRY_TIME ? dps() : 0;
   if (d > 0) damage(d * dt, 0, 0, null);
   if (foe.dead) return;
 

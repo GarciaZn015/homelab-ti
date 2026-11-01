@@ -9,7 +9,7 @@ Abra `jogo-lamina-runica/index.html` no navegador (ou publique esta pasta no Git
 
 - **Toque no monstro** para atacar. Derrote 10 monstros e enfrente o **chefe** antes que o tempo acabe.
 - Se o chefe escapar, você continua enfrentando monstros comuns para juntar ouro. Toque em **Desafiar chefe** para tentar de novo, ou deixe o desafio automático ligado.
-- **Herói**: aumenta o dano de toque (×1,75 a cada 10 níveis).
+- **Herói**: aumenta o dano de toque (×1,6 a cada 10 níveis).
 - **Aliados**: 16 criaturas místicas sorteadas a cada novo jogo (fênix, grifo, dragão, raposa espiritual, unicórnio, coruja arcana, tartaruga ancestral, lobo lunar, serpente alada e cervo estelar). Causam dano mesmo com o jogo fechado (×2 no nível 10 e ×4 a cada 25 níveis). A cena mostra só as 6 mais fortes, para não poluir a tela.
 - **Poderes**: Raio Celeste, Fúria das Lâminas, Chuva de Ouro e Grito de Guerra. Gastam mana e têm recarga.
 - **Relíquias**: a partir do estágio 40 você pode **Renascer** e ganhar essências. Cada essência dá +10% de dano para sempre e serve para comprar artefatos permanentes.
@@ -24,6 +24,8 @@ Abra `jogo-lamina-runica/index.html` no navegador (ou publique esta pasta no Git
 - **Conquistas** com estrelas que dão essências, e **recompensa diária** com sequência de 7 dias.
 - Bolinha vermelha nas abas quando há algo para comprar ou resgatar; selo "melhor compra" nos aliados; segure o botão para comprar várias vezes.
 - Painel recolhível (seta ao lado das abas) e opção de tela cheia para aumentar a área de batalha.
+- **Avanço rápido**: quando seus aliados matam um monstro em menos de 0,1 s, cada vitória conta 4 monstros (o ouro dos pulados é pago). Aparece "⏩ Avanço rápido" embaixo da cena.
+- Os monstros ficam pelo menos 0,3 s na tela: os aliados só atacam depois que o monstro termina de entrar, e o seu toque vale desde o primeiro instante.
 - Atalhos no computador: `Espaço` ataca, `1` a `4` usam os poderes.
 
 ## Equipamentos
@@ -42,7 +44,7 @@ Cada item muda a aparência do herói (5 espadas, 5 chapéus, 4 roupas e 3 anéi
 
 - Chance de item: 25% por chefe, 100% no Chefe Ancestral e 15% no Baú Vivo.
 - O nível do item acompanha o estágio (−2 a +3; Ancestral +5). 8% dos itens são **Excepcionais**, com 10 a 20 níveis a mais.
-- O bônus cresce com o nível: `bônus = base × (1 + nível/10) × (1 + 0,1 × melhorias)`.
+- O bônus cresce com o nível: `bônus = base × (1 + nível/40) × (1 + 0,1 × melhorias)`.
 - Raro ou melhor ganha um bônus secundário (crítico, dano crítico, mana, tempo contra chefes ou ouro).
 - **Sorte acumulada**: cada item sem Lendário aumenta a chance de Lendário e Mítico, e o 40º é garantido.
 - Itens desmanchados viram fragmentos, que melhoram o item equipado (+10% por nível). Há desmanche automático opcional.

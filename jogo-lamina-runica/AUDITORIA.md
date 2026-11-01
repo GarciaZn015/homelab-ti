@@ -44,7 +44,7 @@ Versão do estado: **5**. As migrações ficam em `MIGRATIONS` (`index.html`, bl
 - Fuga do chefe → modo treino → desafio automático após 10 monstros → vitória sobe exatamente 1 estágio.
 
 ## Economia (análise; nenhum valor foi alterado)
-- A vida dos monstros e o ouro crescem ×1,5 por estágio (×57,7 a cada região). O herói custa ×1,075 por nível (×2,06 a cada 10 níveis, com dano ×1,75 a cada 10 níveis mais o crescimento linear). A curva é coerente para um clicker.
+- (Valores revisados em 01/11/2026, ver a seção "Revisão de equilíbrio".) A vida dos monstros e o ouro crescem ×1,55 por estágio. O herói custa ×1,075 por nível (×2,06 a cada 10 níveis, com dano ×1,6 a cada 10 níveis mais o crescimento linear).
 - `hpFor` tem teto de 1e300, alcançado por volta do estágio 1.700. Depois disso a vida e o ouro param de crescer. É um teto de progressão inalcançável na prática; está documentado e não foi mudado.
 - Custos acima de ~1,8e308 viram `Infinity`, e nesse caso a compra fica indisponível sem travar (teste 18). Não foi adotada biblioteca de números grandes: o `Number` cobre todo o alcance jogável, e trocar mudaria fórmulas e saves sem ganho real.
 - O ataque automático da Fúria das Lâminas conta como toque nas estatísticas e na conquista “Dedos Ligeiros”, como antes. Mudar isso mexeria em progresso existente; fica para decisão sua.
@@ -82,3 +82,28 @@ Versão do estado: **5**. As migrações ficam em `MIGRATIONS` (`index.html`, bl
 - Barra superior no celular em pé (até 480 px): o nome da região não é mais cortado e o estágio não quebra linha. O texto da onda some nessa largura, e o progresso continua nos pontinhos logo abaixo.
 - Abas no computador e no celular deitado: os nomes não se encostam mais.
 - O README do laboratório de segurança voltou para a raiz, e o do jogo está em `jogo-lamina-runica/README.md`.
+
+## Revisão de equilíbrio (01/11/2026)
+
+Relato do jogador: "não consigo tocar para bater, e os aliados matam tão rápido que quase não vejo os monstros".
+
+**Causa.** O toque era registrado, mas os monstros morriam em menos de 0,05 s e o jogo passava a maior parte do tempo no intervalo entre um monstro e outro, onde o toque não fazia nada. Uma simulação com compras otimizadas (5 toques/s) mostrou que o jogo estava fácil demais:
+- primeira jornada: do estágio 4 ao 40, um toque matava qualquer monstro, e o estágio 100 chegava em 90 min sem renascer;
+- depois de renascer (40 essências, Elmo 5, Tambor 4): aliados matavam em 0,03 s por mais de 100 estágios;
+- com itens Épicos de nível 50: o mesmo por 150 estágios.
+
+**Mudanças.**
+| | Antes | Agora |
+| --- | --- | --- |
+| Vida por estágio | ×1,5 | ×1,55 |
+| Ouro por monstro | vida/6 | vida/15 |
+| Dano do herói a cada 10 níveis | ×1,75 | ×1,6 |
+| Bônus do item pelo nível | 1 + nível/10 | 1 + nível/40 |
+| Intervalo entre monstros | 0,4 s | 0,25 s |
+| Aliados atacam | desde o surgimento | após 0,3 s (fim da entrada) |
+
+Novidades: **avanço rápido** (aliados matam em menos de 0,1 s → cada vitória conta 4 monstros, com o ouro pago), sem faixa nem vibração de chefe nesse modo (exceto Ancestral), e toques entre monstros mostram o golpe e mantêm o combo.
+
+**Resultado na simulação.** Primeira jornada: estágio 20 em 4,5 min (~7 toques por monstro), estágio 40 em 22 min (~90 toques, aliados ~5 s), trava entre 40 e 60, que é o ponto de renascer. Depois de renascer, os estágios iniciais passam depressa (até o 80 em ~8 min, ou ~3 min com itens Épicos), com cada monstro visível por pelo menos 0,3 s.
+
+**Efeito em saves existentes.** Nenhum valor salvo muda. No mesmo estágio, os monstros ficam mais resistentes (no estágio 80, ~13× mais vida) e os itens ficam mais fracos (um Épico de nível 50 passa de ×5,8 para ×2,8). Quem estava muito avançado pode travar num chefe e precisar juntar ouro ou renascer, como esperado num clicker.
