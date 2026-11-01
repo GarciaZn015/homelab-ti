@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(here, '..');
+export const GAME = path.join(ROOT, 'jogo-lamina-runica', 'index.html');
 export const ORIGINAL = path.join(ROOT, '_backup_original_2026-10-31', 'index.html');
 
 export function fakeStorage({ quota = Infinity, failSet = false } = {}) {
@@ -41,7 +42,7 @@ function script(file) {
 
 // Núcleo atual: dados + estado + salvamento (@core) + fórmulas e utilitários.
 export function loadCore(storage = fakeStorage()) {
-  const js = script(path.join(ROOT, 'index.html'));
+  const js = script(GAME);
   const core = section(js, '/* @core-begin', '/* @core-end */');
   const utils = section(js, '/* =========================================================\n   UTILITÁRIOS', '/* =========================================================\n   ÁUDIO');
   const ctx = vm.createContext({ console, TextEncoder, TextDecoder, btoa, atob, localStorage: storage });

@@ -58,7 +58,7 @@ Versão do estado: **5**. As migrações ficam em `MIGRATIONS` (`index.html`, bl
 - Poderes com nome e tecla, além do ícone. Botão de silenciar. Volume separado para música e efeitos. Aviso quando o navegador bloqueia o áudio. “Texto maior” e “Reduzir movimento” (também respeita a preferência do sistema).
 
 ## Testes executados (resultados reais)
-- `node --test tests/core.test.mjs`: **23/23 passaram**.
+- `node --test tests/core.test.mjs` (na raiz do repositório): **23/23 passaram**.
 - Navegador Chromium (Playwright, servidor local), em perfis de teste isolados, sem o save real:
   - jogador novo, combate, compra, recarga com o progresso mantido;
   - principal corrompido → backup carregado, cópia danificada preservada;
@@ -75,4 +75,10 @@ Versão do estado: **5**. As migrações ficam em `MIGRATIONS` (`index.html`, bl
 2. P2 restante: animações próprias para cada uma das 10 espécies de aliado nos níveis 50/100/200 (hoje a evolução é coroa, aura e escala), mais variedade de silhuetas de monstros por região e ataques visuais dos chefes.
 3. Interface: prévia lado a lado ao equipar item, tooltips curtos, estados vazios ilustrados.
 4. Decisões de regra que dependem de você: estatística de toques da Fúria; teto de progressão no estágio ~1.700.
-5. Versionar o projeto com Git (não foi feito sem sua autorização).
+5. ~~Versionar o projeto com Git~~: feito. O projeto está no repositório `homelab-ti`, pasta `jogo-lamina-runica/`.
+
+## Ajustes após subir para o repositório (01/11/2026)
+- `tests/harness.mjs` procurava `index.html` na raiz do repositório; agora aponta para `jogo-lamina-runica/index.html`. Antes disso os 23 testes falhavam com "arquivo não encontrado".
+- Barra superior no celular em pé (até 480 px): o nome da região não é mais cortado e o estágio não quebra linha. O texto da onda some nessa largura, e o progresso continua nos pontinhos logo abaixo.
+- Abas no computador e no celular deitado: os nomes não se encostam mais.
+- O README do laboratório de segurança voltou para a raiz, e o do jogo está em `jogo-lamina-runica/README.md`.
