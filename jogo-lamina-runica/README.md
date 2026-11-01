@@ -12,6 +12,7 @@ Abra `jogo-lamina-runica/index.html` no navegador (ou publique esta pasta no Git
 - **Herói**: aumenta o dano de toque (×1,6 a cada 10 níveis).
 - **Aliados**: 16 criaturas místicas sorteadas a cada novo jogo (fênix, grifo, dragão, raposa espiritual, unicórnio, coruja arcana, tartaruga ancestral, lobo lunar, serpente alada e cervo estelar). Causam dano mesmo com o jogo fechado (×2 no nível 10 e ×4 a cada 25 níveis). A cena mostra só as 6 mais fortes, para não poluir a tela.
 - **Poderes**: Raio Celeste, Fúria das Lâminas, Chuva de Ouro e Grito de Guerra. Gastam mana e têm recarga.
+- **Códice das Almas**: artefato permanente que dá **+20% de essências ao renascer por nível**, sem limite. Cada nível custa ×1,9 o anterior (4, 8, 15, 28, 53… essências).
 - **Relíquias**: a partir do estágio 40 você pode **Renascer** e ganhar essências. Cada essência dá +10% de dano para sempre e serve para comprar artefatos permanentes.
 - 8 regiões com cenário próprio, monstros gerados proceduralmente e o raro **Baú Vivo**, que solta 12× mais ouro.
 - **Muros com plataformas** nas laterais do mapa: as criaturas mais fortes ficam nelas (2 a 4 por lado, conforme o tamanho da tela). Nos níveis 50, 100 e 200 a criatura evolui de aparência.
@@ -27,6 +28,21 @@ Abra `jogo-lamina-runica/index.html` no navegador (ou publique esta pasta no Git
 - **Avanço rápido**: quando seus aliados matam um monstro em menos de 0,1 s, cada vitória conta 4 monstros (o ouro dos pulados é pago). Aparece "⏩ Avanço rápido" embaixo da cena.
 - Os monstros ficam pelo menos 0,3 s na tela: os aliados só atacam depois que o monstro termina de entrar, e o seu toque vale desde o primeiro instante.
 - Atalhos no computador: `Espaço` ataca, `1` a `4` usam os poderes.
+
+## Árvore de talentos
+
+Fica na aba **Poderes → Talentos**. Os pontos vêm do progresso: **1 a cada 5 estágios de recorde** e **2 a cada renascimento**. Os talentos **ficam para sempre**, mesmo depois de renascer. Dá para **redistribuir** todos os pontos (a primeira vez é grátis, depois custa 2 essências).
+
+São 4 ramos, cada um com 4 níveis. Um nível só abre depois de gastar pontos no mesmo ramo: o nível 2 com 5 pontos, o 3 com 15 e o 4 com 25. Cada melhoria custa 1, 2, 3 ou 4 pontos, conforme o nível.
+
+| Ramo | Nível 1 | Nível 2 | Nível 3 | Nível 4 |
+| --- | --- | --- | --- | --- |
+| **Lâmina** (toque) | Golpe Afiado (+25% toque), Olhos de Lince (+1% crítico) | Ritmo de Batalha (+10% no combo máximo), Execução (+20% contra chefes) | Lâmina Fantasma (1 ataque automático por segundo por nível) | Golpe Final (+50% dano crítico) |
+| **Bestiário** (aliados) | Laço Místico (+25% aliados), Treinador (aliados 2% mais baratos) | Matilha (+1% por aliado no grupo), Brado Ancestral (Grito +5 s) | Fúria Selvagem (+30% dos aliados em chefes) | Despertar Celestial (aliados ×2, ×3, ×4) |
+| **Arcano** (poderes) | Poço de Mana (+10 mana), Fluxo Arcano (+0,1 mana/s) | Eco do Trovão (Raio +30%), Foco (recarga 4% mais rápida) | Tempestade de Lâminas (Fúria +2 ataques/s) | Arquimago (poderes duram +10%) |
+| **Fortuna** (ouro e itens) | Bolsos Fundos (+20% ouro), Faro de Tesouro (+0,5% de Baú Vivo) | Amigo dos Espíritos (+8% frequência, +20% prêmio), Coleta Noturna (+20% ouro offline) | Caçador de Relíquias (+3% de item por chefe) | Sorte Grande (Lendário garantido 2 itens antes) |
+
+Os valores são por nível de talento.
 
 ## Equipamentos
 

@@ -107,3 +107,10 @@ Novidades: **avanço rápido** (aliados matam em menos de 0,1 s → cada vitóri
 **Resultado na simulação.** Primeira jornada: estágio 20 em 4,5 min (~7 toques por monstro), estágio 40 em 22 min (~90 toques, aliados ~5 s), trava entre 40 e 60, que é o ponto de renascer. Depois de renascer, os estágios iniciais passam depressa (até o 80 em ~8 min, ou ~3 min com itens Épicos), com cada monstro visível por pelo menos 0,3 s.
 
 **Efeito em saves existentes.** Nenhum valor salvo muda. No mesmo estágio, os monstros ficam mais resistentes (no estágio 80, ~13× mais vida) e os itens ficam mais fracos (um Épico de nível 50 passa de ×5,8 para ×2,8). Quem estava muito avançado pode travar num chefe e precisar juntar ouro ou renascer, como esperado num clicker.
+
+## Códice das Almas e árvore de talentos (01/11/2026, save v6)
+
+- **Códice das Almas** (artefato): +20% de essências ao renascer por nível, sem limite; custo 4 × 1,9^nível (arredondado para cima).
+- **Árvore de talentos**: 4 ramos × 4 níveis, 24 talentos. Pontos = ⌊recorde ÷ 5⌋ + 2 × renascimentos (calculados, não gravados); talentos gravados em `talents: {id: nível}`. Abertura dos níveis por pontos gastos no ramo (0/5/15/25); custo por melhoria 1/2/3/4. Redistribuir: grátis na primeira vez, depois 2 essências (`stats.respecs`).
+- **Save v6**: só acrescenta `talents` e `stats.respecs`. A validação remove talentos inexistentes e limita o nível ao máximo; o teto de mana passou a considerar o Poço de Mana. Os testes 2 e 4 passaram a usar `consts.VERSION` em vez de 5 fixo, e o teste 2 aceita estatísticas novas desde que comecem em 0.
+- **Testes**: 25 de 25 (2 novos: validação dos talentos e efeito do Códice). No navegador (Pixel 7): aprender, abrir nível 2, Códice 38 → 53 essências no nível 2, redistribuir e recarregar, sem erros.
