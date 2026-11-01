@@ -55,6 +55,15 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .stageBox { flex: 1 1 0; text-align: center; min-width: 0; }
 .stageBox .zone { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .stageBox .stage { font-family: var(--f-display); font-size: 15px; }
+.stageBox { flex-grow: 1.5; }
+.stageBox .stage { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 480px) {
+  #top { gap: 6px; }
+  #top .iconBtn { width: 32px; height: 32px; }
+  .stageBox .zone { font-size: 10px; letter-spacing: .03em; }
+  .stageBox .stage { font-size: 14px; }
+  .stageBox .wave { display: none; }   /* o progresso da onda continua visível nos pontinhos logo abaixo */
+}
 .pips { display: flex; justify-content: center; gap: 3px; margin-top: 3px; }
 .pips i { width: 8px; height: 4px; border-radius: 2px; background: var(--line); }
 .pips i.on { background: var(--gold); }
@@ -142,6 +151,8 @@ html.lowMotion #btnBoss, html.lowMotion .bar.timer.urgent { animation: none; }
 #tabs { display: grid; grid-template-columns: repeat(6, 1fr) 34px; border-bottom: 1px solid var(--line); }
 #tabs button { position: relative; border: 0; background: none; padding: 8px 0 6px; font-size: 10.5px; min-width: 0; font-weight: 800; color: var(--muted); border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 #tabs button svg { width: 18px; height: 18px; }
+#tabs { column-gap: 2px; }
+#tabs button span { max-width: 100%; padding-inline: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #tabs button.on { color: var(--gold); border-bottom-color: var(--gold); }
 #tabs button.has::after { content: ""; position: absolute; top: 5px; right: calc(50% - 16px); width: 8px; height: 8px; border-radius: 50%; background: var(--hp); box-shadow: 0 0 0 2px var(--panel); }
 #tabs #panelToggle { justify-content: center; }
@@ -226,6 +237,8 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
   #app { max-width: 1400px; display: grid; grid-template-columns: minmax(0, 1fr) clamp(300px, 36vw, 440px); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "top panel" "scene panel" "skill panel"; }
   #top { grid-area: top; } #scene { grid-area: scene; min-height: 0; } #skillbar { grid-area: skill; }
   #panel { grid-area: panel; border-top: 0; border-left: 1px solid var(--line); min-height: 0; }
+  #tabs button { font-size: 9.5px; letter-spacing: -.01em; }
+  #tabs button span { padding-inline: 0; }
   #app:has(#panel.collapsed) { grid-template-columns: minmax(0, 1fr) 0; }
   #app:has(#panel.collapsed) #panel { border: 0; overflow: visible; }
   #app:has(#panel.collapsed) #tabs { position: absolute; right: 0; top: 50%; width: 44px; grid-template-columns: 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 12px 0 0 12px; z-index: 5; transform: translateY(-50%); }
