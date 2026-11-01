@@ -64,9 +64,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .iconBtn svg { width: 20px; height: 20px; }
 
 /* ---------- cena ---------- */
-#scene { position: relative; flex: 1 1 auto; min-height: 240px; overflow: hidden; }
+#scene { position: relative; flex: 1 1 auto; min-height: 200px; overflow: hidden; }
 #cv { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; }
-#foe { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: min(78%, 380px); pointer-events: none; text-align: center; }
+#foe { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: min(62%, 360px); pointer-events: none; text-align: center; }
 .foeName { font-family: var(--f-display); font-size: 14px; text-shadow: 0 2px 0 rgba(0,0,0,.5); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .foeName.boss { color: #ffb0b8; }
 .bar { position: relative; height: 16px; border-radius: 8px; background: rgba(10,8,25,.75); border: 1px solid rgba(255,255,255,.18); overflow: hidden; }
@@ -98,7 +98,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .skill.nomana small { color: var(--danger); }
 
 /* ---------- painel ---------- */
-#panel { flex: 0 0 36%; min-height: 0; display: flex; flex-direction: column; background: var(--panel); border-top: 1px solid var(--line); }
+#panel { flex: 0 0 50%; min-height: 0; display: flex; flex-direction: column; background: var(--panel); border-top: 1px solid var(--line); }
 #panel.collapsed { flex: 0 0 auto; }
 #panel.collapsed #qty, #panel.collapsed #list { display: none; }
 #tabs { display: grid; grid-template-columns: repeat(5, 1fr) 40px; border-bottom: 1px solid var(--line); }
@@ -109,23 +109,26 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 #tabs #panelToggle { justify-content: center; }
 #panelToggle svg { transition: transform .2s; }
 #panel.collapsed #panelToggle svg { transform: rotate(180deg); }
-#qty { display: flex; gap: 6px; justify-content: flex-end; padding-block: 6px; }
+#qty { display: flex; gap: 6px; justify-content: flex-end; padding-block: 5px 2px; }
 #qty button { border: 1px solid var(--line); background: var(--panel-2); border-radius: 8px; padding: 3px 10px; font-size: 12px; font-weight: 900; color: var(--muted); }
 #qty button.on { background: var(--gold); color: #3a2400; border-color: var(--gold); }
-#list { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px; display: flex; flex-direction: column; gap: 8px; padding-top: 6px; }
-.row { display: flex; align-items: center; gap: 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+#list { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 12px; display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
+.row { display: flex; align-items: center; gap: 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 6px 8px; }
 .row.locked { opacity: .45; }
 .row.best { border-color: var(--ok); }
 .av { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-family: var(--f-display); font-size: 18px; color: #160f2a; overflow: hidden; }
 .av svg { width: 24px; height: 24px; }
 .av img { width: 44px; height: 44px; display: block; }
+.av.reroll { position: relative; cursor: pointer; padding: 0; border: 0; }
+.av.reroll::after { content: "↻"; position: absolute; right: 2px; bottom: 0; font: 900 12px var(--f-body); color: #fff; text-shadow: 0 1px 2px #000; }
 .info { flex: 1 1 auto; min-width: 0; }
-.info .t { font-weight: 900; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info .t { font-weight: 900; font-size: 14px; line-height: 1.25; }
 .info .t em { font-style: normal; color: var(--gold); font-variant-numeric: tabular-nums; }
 .info .s { font-size: 12px; color: var(--muted); line-height: 1.3; }
 .info .s b { color: var(--text); font-variant-numeric: tabular-nums; }
 .chip { display: inline-block; font-size: 10px; font-weight: 900; color: #0f2a14; background: var(--ok); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 1px; }
 .stars { color: var(--gold); letter-spacing: 1px; }
+.evo { color: var(--essence); font-weight: 900; }
 .buy { flex: 0 0 auto; min-width: 92px; border: 0; border-radius: 10px; padding: 6px 8px; background: linear-gradient(180deg, #ffd977, var(--gold)); color: #3a2400; box-shadow: 0 3px 0 var(--gold-deep); display: flex; flex-direction: column; align-items: center; line-height: 1.15; touch-action: manipulation; }
 .buy .a { font-size: 11px; font-weight: 900; }
 .buy .b { font-family: var(--f-display); font-size: 13px; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 3px; }
@@ -243,12 +246,11 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
    ========================================================= */
 const SAVE_KEY = 'laminaRunica.save.v1';
 const BACKUP_KEY = 'laminaRunica.backup.v1';
-const VERSION = 2;
+const VERSION = 3;
 const WAVES = 10;
 const OFFLINE_CAP = 12 * 3600;       // máximo de 12 h de progresso offline
 const PRESTIGE_STAGE = 40;
 const ACTIVE_WINDOW = 90 * 1000;     // sem tocar por 90 s = jogador ausente (AFK)
-const ALLY_SHOWN = 6;                // quantos aliados aparecem na cena
 
 const ALLIES = [
   { name: 'Brisa',    cost: 50,     dps: 5      },
@@ -319,6 +321,17 @@ const ACH = [
   { id: 'prest',  name: 'Renascido',          unit: 'renascimentos',        get: () => S.prestiges,     goals: [1, 3, 10, 25] },
 ];
 
+const QUEST_TYPES = [
+  { type: 'taps',     text: g => `Toque ${g} vezes nos monstros`,          goals: [300, 600, 1000] },
+  { type: 'kills',    text: g => `Derrote ${g} monstros`,                  goals: [60, 120, 200] },
+  { type: 'bosses',   text: g => `Vença ${g} chefes`,                      goals: [3, 6, 10] },
+  { type: 'skills',   text: g => `Use poderes ${g} vezes`,                 goals: [3, 6, 10] },
+  { type: 'wisps',    text: g => `Toque em ${g} espíritos errantes`,       goals: [1, 2, 3] },
+  { type: 'combo',    text: g => `Faça um combo de ${g} toques`,           goals: [30, 60, 100] },
+  { type: 'upgrades', text: g => `Suba ${g} níveis do herói ou de aliados`, goals: [25, 50, 100] },
+];
+const QKEYS = ['q0', 'q1', 'q2'];
+
 const ZONES = [
   { name: 'Campos de Âmbar',      sky: ['#3b2a5e', '#f2a65a'], far: '#6a4a78', near: '#3d5a3a', ground: '#4a6a34', hue: 95 },
   { name: 'Floresta Sussurrante', sky: ['#0d2529', '#3f8f7a'], far: '#1e4a44', near: '#163a31', ground: '#22442a', hue: 140 },
@@ -343,13 +356,14 @@ function defaults() {
     gold: 0, stage: 1, wave: 0, maxStage: 1, runMaxStage: 1, bossFailed: false, farmKills: 0,
     hero: 1, allies: ALLIES.map(() => 0), allyForms: randomForms(),
     skills: SKILLS.map(() => ({ lvl: 0, until: 0, cd: 0 })), mana: 50,
-    ess: 0, essTotal: 0, arts: {}, prestiges: 0, ach: {},
+    ess: 0, essTotal: 0, arts: {}, prestiges: 0, ach: {}, ancientBest: 0,
     daily: { last: '', streak: 0 },
+    quests: { day: '', bonus: false, q0: { type: '', goal: 0, prog: 0, done: false }, q1: { type: '', goal: 0, prog: 0, done: false }, q2: { type: '', goal: 0, prog: 0, done: false } },
     stats: { taps: 0, crits: 0, kills: 0, bosses: 0, chests: 0, gold: 0, skills: 0, maxTap: 0, maxCombo: 0, wisps: 0,
-      active: 0, open: 0, offline: 0 },
+      active: 0, open: 0, offline: 0, rerolls: 0, quests: 0 },
     settings: {
       sound: true, volume: 0.6, vibrate: true, dmgNums: true, particles: true, shake: true,
-      notation: 'letters', autosave: 10, autoBoss: true, buyQty: 1, offlineModal: true, panelCollapsed: false,
+      notation: 'letters', autosave: 10, autoBoss: true, buyQty: 1, offlineModal: true, panelCollapsed: false, music: true,
     },
   };
 }
@@ -806,13 +820,15 @@ function spawn(forceBoss) {
   const seed = (S.stage * 7919 + S.wave * 104729 + Math.floor(Math.random() * 1e6)) >>> 0;
   const r = rng(seed);
   const chest = !boss && S.stage >= 3 && Math.random() < 0.03;
+  const ancient = boss && S.stage % 10 === 0;
   const zone = zoneOf(S.stage);
   let hp = hpFor(S.stage);
   if (boss) hp *= 6;
+  if (ancient) hp *= 1.6;
   if (chest) hp *= 0.6;
   foe = {
-    boss, chest, seed, hp, maxHp: hp,
-    name: chest ? 'Baú Vivo' : makeName(r, boss),
+    boss, chest, ancient, seed, hp, maxHp: hp,
+    name: chest ? 'Baú Vivo' : ancient ? makeName(r, false) + ', o Ancestral' : makeName(r, boss),
     hue: (zone.hue + (r() - 0.5) * 140 + 360) % 360,
     lobes: 3 + Math.floor(r() * 5), phase: r() * 6.28, amp: 0.05 + r() * 0.09,
     eyes: boss ? 2 + Math.floor(r() * 2) : 1 + Math.floor(r() * 3),
@@ -828,13 +844,20 @@ function killFoe() {
   f.dead = true; f.deathT = 0;
   let g = goldFor(S.stage) * goldMult();
   if (f.boss) g *= 6;
+  if (f.ancient) g *= 2;
   if (f.chest) { g *= 12; S.stats.chests++; toast(`Baú Vivo derrotado! +${fmt(g)} de ouro`, 'gold'); }
   S.gold += g; S.stats.gold += g; S.stats.kills++;
   fx.coinBurst(f.boss || f.chest ? 14 : 5);
   fx.dieBurst();
   SFX.coin();
+  questAdd('kills', 1);
   if (f.boss) {
     S.stats.bosses++;
+    questAdd('bosses', 1);
+    if (f.ancient && S.stage > S.ancientBest) {
+      S.ancientBest = S.stage; S.ess += 2; S.essTotal += 2;
+      toast('Chefe Ancestral derrotado pela primeira vez! +2 essências', 'gold');
+    }
     S.stage++; S.wave = 0; S.bossFailed = false; S.farmKills = 0;
     if (S.stage > S.runMaxStage) S.runMaxStage = S.stage;
     if (S.stage > S.maxStage) S.maxStage = S.stage;
@@ -882,6 +905,7 @@ function catchWisp() {
   const p = wispPos();
   wisp = null; nextWisp = wispInterval();
   S.stats.wisps++;
+  questAdd('wisps', 1);
   SFX.wisp(); vibrate(25);
   for (let i = 0; i < 26; i++) fx.spark(p.x, p.y, i % 2 ? '#fff3a8' : '#9fe6ff', 1.3);
   const bonus = 1 + 0.5 * art('lanter');
@@ -912,6 +936,7 @@ function doTap(x, y, auto) {
     combo.n = combo.t < 0.6 ? combo.n + 1 : 1;
     combo.t = 0;
     if (combo.n > S.stats.maxCombo) S.stats.maxCombo = combo.n;
+    questAdd('taps', 1); questAdd('combo', combo.n, true);
   }
   const crit = Math.random() < critChance();
   let d = tapDmg() * comboMult();
@@ -936,6 +961,7 @@ function buyHero() {
   if (n < 1 || S.gold < c) return false;
   const before = S.hero;
   S.gold -= c; S.hero += n;
+  questAdd('upgrades', n);
   if (Math.floor(before / 10) !== Math.floor(S.hero / 10)) structDirty = true;
   SFX.buy(); saveSoon(); uiDirty = true;
   return true;
@@ -946,6 +972,7 @@ function buyAlly(i) {
   if (n < 1 || S.gold < c) return false;
   const was = S.allies[i];
   S.gold -= c; S.allies[i] += n;
+  questAdd('upgrades', n);
   if (was === 0) { toast(`${ALLIES[i].name}, ${SPECIES[S.allyForms[i].sp]}, entrou para o grupo!`, 'gold'); structDirty = true; }
   SFX.buy(); saveSoon(); uiDirty = true;
   return true;
@@ -970,6 +997,7 @@ function useSkill(i) {
   st.cd = S.clock + sk.cd;
   st.until = S.clock + sk.dur(st.lvl);
   S.stats.skills++;
+  questAdd('skills', 1);
   if (i === 0) {
     SFX.zap(); fx.lightning(); fx.shake(12); vibrate(30);
     const c = scene.monster();
@@ -1004,7 +1032,7 @@ function prestige() {
   const g = essGain();
   if (g <= 0) return;
   const keep = { ess: S.ess + g, essTotal: S.essTotal + g, arts: S.arts, prestiges: S.prestiges + 1, stats: S.stats, ach: S.ach,
-    daily: S.daily, allyForms: S.allyForms, settings: S.settings, maxStage: S.maxStage, created: S.created, clock: S.clock };
+    daily: S.daily, quests: S.quests, ancientBest: S.ancientBest, allyForms: S.allyForms, settings: S.settings, maxStage: S.maxStage, created: S.created, clock: S.clock };
   S = Object.assign(defaults(), keep);
   S.mana = manaMax();
   SFX.prestige(); vibrate([30, 60, 30]);
@@ -1021,6 +1049,80 @@ function challengeBoss() {
   spawnDelay = 0; foe = null; spawn(true);
   uiDirty = true;
 }
+
+/* ---------- missões diárias ---------- */
+function ensureQuests() {
+  const d = todayKey();
+  if (S.quests.day === d) return;
+  const types = QUEST_TYPES.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+  const q = { day: d, bonus: false };
+  types.forEach((t, k) => { q[QKEYS[k]] = { type: t.type, goal: t.goals[Math.floor(Math.random() * t.goals.length)], prog: 0, done: false }; });
+  S.quests = q;
+  if (tab === 'conquistas') structDirty = true;
+}
+function questAdd(type, n, isMax) {
+  for (const k of QKEYS) {
+    const q = S.quests[k];
+    if (!q || q.type !== type || q.done) continue;
+    q.prog = isMax ? Math.max(q.prog, n) : q.prog + n;
+  }
+}
+function questGold() { return goldFor(S.stage) * 60 * (1 + 0.3 * art('bolsa')); }
+function claimQuest(k) {
+  const q = S.quests[k];
+  if (!q || q.done || q.prog < q.goal) return false;
+  q.done = true; S.stats.quests++;
+  const g = questGold();
+  S.gold += g; S.stats.gold += g;
+  SFX.win(); vibrate([15, 30, 15]);
+  toast(`Missão concluída! +${fmt(g)} de ouro`, 'gold');
+  save(); uiDirty = true;
+  return true;
+}
+function claimQuestBonus() {
+  if (S.quests.bonus || !QKEYS.every(k => S.quests[k].done)) return false;
+  S.quests.bonus = true; S.ess += 2; S.essTotal += 2;
+  SFX.prestige();
+  toast('Todas as missões de hoje concluídas! +2 essências', 'gold');
+  save(); uiDirty = true;
+  return true;
+}
+
+/* ---------- trocar a criatura de um aliado ---------- */
+function rerollCost() { return S.stats.rerolls === 0 ? 0 : 1; }
+function openReroll(i) {
+  const f = S.allyForms[i], c = rerollCost();
+  openModal(`<h2>Trocar a criatura de ${ALLIES[i].name}?</h2>
+    <p>Hoje ${ALLIES[i].name} é <b>${SPECIES[f.sp]}</b>. Uma nova criatura e uma nova cor serão sorteadas. O nível e o dano não mudam.</p>
+    <p>Custo: <b>${c ? c + ' essência' : 'grátis (primeira troca)'}</b>.</p>
+    <div class="btns"><button class="btn purple" id="okReroll" ${S.ess < c ? 'disabled' : ''}>Sortear</button><button class="btn" data-close>Cancelar</button></div>`,
+    sh => sh.querySelector('#okReroll').addEventListener('click', () => {
+      const cost = rerollCost();
+      if (S.ess < cost) return;
+      S.ess -= cost; S.stats.rerolls++;
+      let sp; do { sp = Math.floor(Math.random() * SPECIES.length); } while (sp === f.sp);
+      S.allyForms[i] = { sp, hue: Math.floor(Math.random() * 360) };
+      SFX.wisp(); structDirty = true; uiDirty = true; save();
+      closeModal();
+      toast(`${ALLIES[i].name} agora é ${SPECIES[sp]}!`, 'gold');
+    }));
+}
+
+/* ---------- música de fundo (gerada, sem arquivos) ---------- */
+const PENTA = [0, 3, 5, 7, 10, 12, 15, 17];
+let musicStep = 0, musicPat = [];
+function musicTick() {
+  if (!AC || !S.settings.sound || !S.settings.music || document.hidden || AC.state !== 'running') return;
+  const z = Math.floor((S.stage - 1) / 10) % ZONES.length;
+  const root = 196 * Math.pow(2, [0, 2, -2, 3, 5, -3, 1, -5][z] / 12);
+  const st = musicStep++ % 16;
+  if (st === 0) musicPat = Array.from({ length: 16 }, (_, k) => (k % 2 === 0 || Math.random() < 0.3) && Math.random() < 0.75 ? PENTA[Math.floor(Math.random() * PENTA.length)] : -1);
+  if (st % 8 === 0) tone(root / 2, 1.6, 'triangle', 0.07);
+  if (st % 8 === 4) tone(root / 2 * Math.pow(2, 7 / 12), 1.2, 'triangle', 0.05);
+  const n = musicPat[st];
+  if (n >= 0) tone(root * Math.pow(2, n / 12), 0.35, 'sine', 0.045);
+}
+setInterval(musicTick, 240);
 
 /* ---------- recompensa diária ---------- */
 function dailyState() {
@@ -1111,16 +1213,17 @@ const scene = {
   ground() { return H * 0.87; },
   unit() { return Math.min(W / 400, H / 420); },
   monster() {
-    const big = foe && foe.boss ? 1.25 : foe && foe.chest ? 0.85 : 1;
-    const r = Math.min(W * 0.21, H * 0.29) * big;
-    return { x: W * 0.64, y: this.ground() - r * 0.78, r };
+    const big = foe && foe.ancient ? 1.25 : foe && foe.boss ? 1.12 : foe && foe.chest ? 0.85 : 1;
+    const r = Math.min(W * 0.15, H * 0.22) * big;
+    return { x: W * 0.62, y: this.ground() - r * 0.78, r };
   },
-  heroPos() { return { x: W * 0.22, y: this.ground() }; },
+  heroPos() { return { x: W * 0.33, y: this.ground() }; },
   resize() {
     const rect = cv.getBoundingClientRect();
     DPR = Math.min(2, window.devicePixelRatio || 1);
     W = Math.max(1, rect.width); H = Math.max(1, rect.height);
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    this.layout = wallLayout();
     this.zoneChanged();
   },
   zoneChanged() {
@@ -1157,6 +1260,7 @@ const scene = {
       b.fillStyle = `rgba(0,0,0,${0.05 + r() * 0.1})`;
       b.fillRect(r() * W, this.ground() + 6 + r() * (H - this.ground()), 4 + r() * 12, 2);
     }
+    drawWalls(b, z, this.layout || wallLayout());
   },
 };
 
@@ -1226,7 +1330,8 @@ function drawMonster(m, t) {
     ctx.save();
     ctx.globalAlpha = alpha * (0.35 + Math.sin(t * 4) * 0.1);
     const ag = ctx.createRadialGradient(0, 0, r * 0.5, 0, 0, r * 1.5);
-    ag.addColorStop(0, 'rgba(255,60,90,0.8)'); ag.addColorStop(1, 'rgba(255,60,90,0)');
+    const ac = m.ancient ? '197,139,255' : '255,60,90';
+    ag.addColorStop(0, `rgba(${ac},0.8)`); ag.addColorStop(1, `rgba(${ac},0)`);
     ctx.fillStyle = ag; ctx.beginPath(); ctx.arc(0, 0, r * 1.5, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
@@ -1321,7 +1426,7 @@ function drawChest(m, r, t) {
 
 function drawHero(t) {
   const p = scene.heroPos();
-  const s = scene.unit();
+  const s = scene.unit() * 0.7;
   const fury = skillActive(1);
   const lunge = hero.atk > 0 ? Math.sin((hero.atk / 0.14) * Math.PI) * 18 * s : 0;
   ctx.save();
@@ -1357,40 +1462,98 @@ function drawHero(t) {
   ctx.restore();
 }
 
-// Formação fixa: no máximo ALLY_SHOWN criaturas na cena, as mais fortes. O resto aparece só como contador.
-const SLOTS = [[0.07, 34], [0.36, 158], [0.08, 122], [0.21, 168], [0.05, 205], [0.33, 228]];
+// Muros nas laterais: cada muro tem plataformas (2 a 4, conforme a altura da cena).
+// As criaturas mais fortes ocupam as plataformas, alternando esquerda e direita de baixo para cima.
+function wallLayout() {
+  const ww = clamp(W * 0.15, 46, 110);
+  const gy = H * 0.87;
+  const top = 74;
+  const per = clamp(Math.floor((gy - top) / 58), 2, 4);
+  const step = (gy - top) / per;
+  const ys = [];
+  for (let k = 0; k < per; k++) ys.push(gy - step * (k + 1) + step * 0.35);
+  const slots = [];
+  ys.forEach(y => { slots.push({ x: ww * 0.5, y, side: 1 }); slots.push({ x: W - ww * 0.5, y, side: -1 }); });
+  const sc = clamp(Math.min(ww / 40, step / 34), 0.8, 1.8);
+  return { ww, gy, ys, slots, sc, step, wallTop: ys[per - 1] - step * 0.5 };
+}
+function drawWalls(b, z, L) {
+  for (const side of [0, 1]) {
+    const x0 = side ? W - L.ww : 0;
+    b.fillStyle = z.far; b.fillRect(x0, L.wallTop, L.ww, L.gy - L.wallTop);
+    b.fillStyle = 'rgba(18,12,34,0.42)'; b.fillRect(x0, L.wallTop, L.ww, L.gy - L.wallTop);
+    b.strokeStyle = 'rgba(0,0,0,0.28)'; b.lineWidth = 1;
+    let row = 0;
+    for (let y = L.wallTop + 12; y < L.gy; y += 12, row++) {
+      b.beginPath(); b.moveTo(x0, y); b.lineTo(x0 + L.ww, y); b.stroke();
+      for (let x = x0 + (row % 2 ? 11 : 0); x < x0 + L.ww; x += 22) { b.beginPath(); b.moveTo(x, y - 12); b.lineTo(x, y); b.stroke(); }
+    }
+    b.fillStyle = 'rgba(255,255,255,0.09)';
+    b.fillRect(side ? x0 : x0 + L.ww - 4, L.wallTop, 4, L.gy - L.wallTop);
+    // ameias
+    b.fillStyle = z.far;
+    const cw = L.ww / 5;
+    for (let i = 0; i < 5; i += 2) b.fillRect(x0 + i * cw, L.wallTop - 10, cw, 10);
+    b.fillStyle = 'rgba(18,12,34,0.42)';
+    for (let i = 0; i < 5; i += 2) b.fillRect(x0 + i * cw, L.wallTop - 10, cw, 10);
+    // estandarte
+    const bx = x0 + L.ww * 0.5 - 7;
+    b.fillStyle = `hsl(${z.hue},55%,38%)`;
+    b.beginPath(); b.moveTo(bx, L.wallTop + 4); b.lineTo(bx + 14, L.wallTop + 4); b.lineTo(bx + 14, L.wallTop + 30); b.lineTo(bx + 7, L.wallTop + 24); b.lineTo(bx, L.wallTop + 30); b.closePath(); b.fill();
+    b.fillStyle = '#ffc94a'; b.fillRect(bx + 5, L.wallTop + 10, 4, 4);
+    // plataformas de madeira
+    for (const y of L.ys) {
+      const px = side ? x0 - 12 : x0, pw = L.ww + 12;
+      b.fillStyle = '#5a3a1e'; b.fillRect(px, y, pw, 7);
+      b.fillStyle = '#8a5e32'; b.fillRect(px, y, pw, 3);
+      b.fillStyle = '#4a2e16';
+      const ix = side ? x0 - 12 : x0 + L.ww + 12;
+      b.beginPath(); b.moveTo(ix, y + 7); b.lineTo(side ? x0 : x0 + L.ww, y + 7); b.lineTo(side ? x0 : x0 + L.ww, y + 20); b.closePath(); b.fill();
+    }
+  }
+}
+function evoTier(l) { return l >= 200 ? 3 : l >= 100 ? 2 : l >= 50 ? 1 : 0; }
 let allyFireT = [];
 function shownAllies() {
   const owned = [];
   for (let i = 0; i < ALLIES.length; i++) if (S.allies[i] > 0) owned.push(i);
   owned.sort((a, b) => allyDps(b) - allyDps(a));
-  return { list: owned.slice(0, ALLY_SHOWN), total: owned.length };
+  const n = scene.layout ? scene.layout.slots.length : 6;
+  return { list: owned.slice(0, n), total: owned.length };
 }
 let shownCache = { list: [], total: 0 };
 function drawAllies(t, dt) {
   const shout = skillActive(3);
-  const u = scene.unit();
-  const gy = scene.ground();
+  const L = scene.layout;
+  if (!L) return;
   shownCache.list.forEach((i, k) => {
-    const [fx_, hu] = SLOTS[k];
+    const slot = L.slots[k];
+    if (!slot) return;
     const f = S.allyForms[i];
-    const x = W * fx_ + 10 * u;
-    const y = Math.max(gy - hu * u, 88) + Math.sin(t * 2 + i) * 4 * u;
+    const tier = evoTier(S.allies[i]);
+    const sc = L.sc * (1 + 0.08 * tier);
+    const x = slot.x;
+    const y = slot.y - 9 * sc + Math.sin(t * 2.2 + i) * 1.5;
     allyPos[i] = { x, y };
-    const sc = 1.3 * u;
     ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = shout ? '#ffc94a' : `hsl(${f.hue},90%,70%)`;
-    ctx.beginPath(); ctx.ellipse(x, y + 2 * sc, 16 * sc, 13 * sc, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.translate(x, y); ctx.scale(sc, sc);
+    if (tier > 0 || shout) {
+      ctx.globalAlpha = 0.18 + 0.08 * tier + Math.sin(t * 3 + i) * 0.05;
+      ctx.fillStyle = shout ? '#ffc94a' : tier >= 3 ? '#ffd84a' : `hsl(${f.hue},90%,72%)`;
+      ctx.beginPath(); ctx.ellipse(x, y, 15 * sc, 12 * sc, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    ctx.translate(x, y); ctx.scale(slot.side * sc, sc);
     drawCreature(ctx, f.sp, f.hue, t + i);
+    if (tier >= 2) {
+      ctx.fillStyle = tier >= 3 ? '#ffd84a' : '#c58bff';
+      ctx.beginPath(); ctx.moveTo(-4, -17); ctx.lineTo(-4, -21); ctx.lineTo(-2, -19); ctx.lineTo(0, -22); ctx.lineTo(2, -19); ctx.lineTo(4, -21); ctx.lineTo(4, -17); ctx.closePath(); ctx.fill();
+    }
     ctx.restore();
     allyFireT[i] = (allyFireT[i] ?? Math.random()) - dt * (shout ? 2 : 1);
     if (allyFireT[i] <= 0 && foe && !foe.dead && spawnDelay <= 0) {
       allyFireT[i] = 0.8 + Math.random() * 0.8;
       const m = scene.monster();
-      if (projs.length < 30) projs.push({ x: x + 14 * sc, y, tx: m.x + (Math.random() - 0.5) * m.r, ty: m.y + (Math.random() - 0.5) * m.r, t: 0, color: `hsl(${f.hue},90%,70%)` });
+      if (projs.length < 30) projs.push({ x: x + slot.side * 12 * sc, y, tx: m.x + (Math.random() - 0.5) * m.r, ty: m.y + (Math.random() - 0.5) * m.r, t: 0, color: `hsl(${f.hue},90%,70%)` });
     }
   });
 }
@@ -1484,7 +1647,7 @@ function render(t, dt) {
     ctx.globalAlpha = 1 - combo.t / 0.6 * 0.6;
     ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(20,10,30,0.85)';
     const txt = `COMBO ${combo.n}  +${Math.round((comboMult() - 1) * 100)}%`;
-    const y = hp.y - 120 * scene.unit();
+    const y = hp.y - 95 * scene.unit();
     ctx.strokeText(txt, W * 0.5, Math.max(y, 80));
     ctx.fillStyle = combo.n >= 100 ? '#ff8a5a' : '#ffd84a';
     ctx.fillText(txt, W * 0.5, Math.max(y, 80));
@@ -1563,9 +1726,10 @@ function buildList() {
     for (let i = 0; i < ALLIES.length; i++) {
       if (i > highest + 2) break;
       const locked = i > highest + 1;
-      html += rowHTML('ally' + i, locked ? '?' : `<img alt="" src="${creatureAvatar(i)}">`, locked ? 'var(--line)' : 'transparent');
+      html += locked ? rowHTML('ally' + i, '?', 'var(--line)')
+        : rowHTML('ally' + i, `<img alt="" src="${creatureAvatar(i)}">`, 'transparent').replace('<div class="av"', `<button class="av reroll" data-reroll="${i}" aria-label="Trocar a criatura de ${ALLIES[i].name}"`).replace(`</div>\n    <div class="info">`, `</button>\n    <div class="info">`);
     }
-    html += `<p class="muted">Cada aliado é uma criatura mística sorteada no início da sua jornada. No nível 10 o dano dobra, e a cada 25 níveis é multiplicado por 4. A cena mostra os ${ALLY_SHOWN} mais fortes.</p>`;
+    html += `<p class="muted">Cada aliado é uma criatura mística. Toque na imagem para sortear outra criatura (a primeira troca é grátis). Nos níveis 50, 100 e 200 a criatura evolui de aparência. A cena mostra as mais fortes nas plataformas dos muros.</p>`;
   } else if (tab === 'habilidades') {
     SKILLS.forEach((s, i) => { html += rowHTML('skill' + i, ICON['s' + i], 'var(--ink)'); });
     html += `<p class="muted">Use os poderes na barra acima do painel (ou teclas 1 a 4). Eles gastam mana, que se recupera sozinha.</p>`;
@@ -1576,6 +1740,9 @@ function buildList() {
     ARTIFACTS.forEach(a => { html += rowHTML('art_' + a.id, ICON.relic, a.color); });
   } else {
     html += `<div class="card" id="dailyCard"></div>`;
+    html += `<div class="sectionLabel">Missões de hoje</div>`;
+    QKEYS.forEach(k => { html += rowHTML('quest_' + k, ICON.skills, 'linear-gradient(135deg,#9fe6ff,#2a7fd6)'); });
+    html += rowHTML('questBonus', ICON.gem, 'linear-gradient(135deg,#dcb2ff,#8a4fd6)');
     html += `<div class="sectionLabel">Conquistas (dão essências)</div>`;
     ACH.forEach(a => { html += rowHTML('ach_' + a.id, ICON.trophy, 'linear-gradient(135deg,#ffd977,#c9871c)'); });
     html += `<div class="sectionLabel">Estatísticas</div><div class="card"><dl class="stats" id="statsDl"></dl></div>`;
@@ -1622,7 +1789,8 @@ function updateList() {
       else {
         title = `${A.name} <em>${l ? 'Nv ' + l : ''}</em>${i === best ? '<span class="chip">melhor compra</span>' : ''}`;
         const nextMs = l < 10 ? 10 : Math.floor(l / 25) * 25 + 25;
-        sub = `${SPECIES[S.allyForms[i].sp]}<br>${l ? `DPS: <b>${fmt(allyDps(i) * allyFactor())}</b> · ` : `DPS base: <b>${fmt(A.dps)}</b> · `}Nv ${nextMs}: ×${l < 10 ? 2 : 4}`;
+        const tier = evoTier(l);
+        sub = `${SPECIES[S.allyForms[i].sp]}${tier ? ` · <span class="evo">Evolução ${'★'.repeat(tier)}</span>` : ''}<br>${l ? `DPS: <b>${fmt(allyDps(i) * allyFactor())}</b> · ` : `DPS base: <b>${fmt(A.dps)}</b> · `}Nv ${nextMs}: ×${l < 10 ? 2 : 4}`;
         a = l ? `+${n} Nv` : (n > 1 ? `Contratar +${n}` : 'Contratar'); b = ICON.coin + fmt(c); can = S.gold >= c;
       }
       r.el.classList.toggle('best', i === best);
@@ -1647,6 +1815,17 @@ function updateList() {
       if (A.max && l >= A.max) { a = 'Máximo'; b = '—'; can = false; }
       else { a = l ? 'Melhorar' : 'Comprar'; b = ICON.gem + artCost(A); can = S.ess >= artCost(A); }
       cls = 'ess';
+    } else if (k.startsWith('quest_')) {
+      const q = S.quests[k.slice(6)], T = QUEST_TYPES.find(x => x.type === q.type);
+      title = T ? T.text(q.goal) : 'Missão';
+      sub = q.done ? 'Concluída! Novas missões amanhã.' : `<b>${fmt(Math.min(q.prog, q.goal))}</b> / ${fmt(q.goal)}`;
+      if (q.done) { a = 'Concluída'; b = '✓'; can = false; }
+      else { a = q.prog >= q.goal ? 'Resgatar' : 'Recompensa'; b = ICON.coin + fmt(questGold()); can = q.prog >= q.goal; }
+    } else if (k === 'questBonus') {
+      const n = QKEYS.filter(x => S.quests[x].done).length;
+      title = 'Baú das missões';
+      sub = S.quests.bonus ? 'Resgatado hoje. Volte amanhã!' : `Conclua as 3 missões de hoje (${n}/3)`;
+      a = S.quests.bonus ? 'Resgatado' : 'Recompensa'; b = S.quests.bonus ? '✓' : ICON.gem + 2; can = !S.quests.bonus && n === 3; cls = 'ess';
     } else if (k.startsWith('ach_')) {
       const A = ACH.find(x => 'ach_' + x.id === k), tier = S.ach[A.id] || 0, done = tier >= A.goals.length;
       const v = A.get();
@@ -1674,7 +1853,7 @@ function updateList() {
       ['Estágio máximo', S.maxStage], ['Estágio desta jornada', S.runMaxStage], ['Toques', fmt(st.taps)], ['Críticos', fmt(st.crits)],
       ['Maior golpe', fmt(st.maxTap)], ['Maior combo', fmt(st.maxCombo)], ['Monstros derrotados', fmt(st.kills)], ['Chefes derrotados', fmt(st.bosses)],
       ['Baús Vivos', fmt(st.chests)], ['Espíritos tocados', fmt(st.wisps)], ['Ouro total ganho', fmt(st.gold)], ['Poderes usados', fmt(st.skills)],
-      ['Renascimentos', S.prestiges],
+      ['Missões concluídas', fmt(st.quests)], ['Maior Chefe Ancestral', S.ancientBest || '—'], ['Trocas de criatura', fmt(st.rerolls)], ['Renascimentos', S.prestiges],
     ].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join(''));
   }
 }
@@ -1685,7 +1864,7 @@ function tabBadges() {
     aliados: ALLIES.some((A, i) => i <= highestAlly() + 1 && S.gold >= allyCost(i, 1)),
     habilidades: SKILLS.some((sk, i) => S.hero >= sk.unlock && S.skills[i].lvl < SKILL_MAX && S.gold >= skillCost(i)),
     reliquias: essGain() > 0 || ARTIFACTS.some(a => !(a.max && art(a.id) >= a.max) && S.ess >= artCost(a)),
-    conquistas: dailyState().available || ACH.some(a => { const t = S.ach[a.id] || 0; return t < a.goals.length && a.get() >= a.goals[t]; }),
+    conquistas: dailyState().available || QKEYS.some(k => !S.quests[k].done && S.quests[k].prog >= S.quests[k].goal) || (!S.quests.bonus && QKEYS.every(k => S.quests[k].done)) || ACH.some(a => { const t = S.ach[a.id] || 0; return t < a.goals.length && a.get() >= a.goals[t]; }),
   };
   document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('has', !!can[b.dataset.tab]));
 }
@@ -1696,6 +1875,7 @@ function buildSkillBar() {
 }
 
 function updateHUD() {
+  ensureQuests();
   shownCache = shownAllies();
   setText($('#goldTxt'), fmt(S.gold));
   setText($('#essTxt'), String(S.ess));
@@ -1728,7 +1908,7 @@ function updateFoeUI(force) {
   if (!foe) return;
   const n = $('#foeName');
   if (force) {
-    n.textContent = foe.boss ? `CHEFE · ${foe.name}` : foe.name;
+    n.textContent = foe.ancient ? `ANCESTRAL · ${foe.name}` : foe.boss ? `CHEFE · ${foe.name}` : foe.name;
     n.classList.toggle('boss', foe.boss);
     $('#timerBar').hidden = !foe.boss;
   }
@@ -1765,7 +1945,8 @@ function openSettings() {
   openModal(`
     <h2>Configurações</h2>
     <div class="sectionLabel">Som e toque</div>
-    ${sw('sound', 'Efeitos sonoros')}
+    ${sw('sound', 'Sons')}
+    ${sw('music', 'Música de fundo')}
     <div class="setRow"><label for="volume">Volume</label><input type="range" id="volume" min="0" max="1" step="0.05" value="${st.volume}"></div>
     ${sw('vibrate', 'Vibração', 'Funciona em celulares compatíveis')}
     <div class="sectionLabel">Tela</div>
@@ -1804,7 +1985,7 @@ function openSettings() {
         : 'O progresso fica salvo neste navegador. Para levar a outro aparelho, use o código de backup abaixo.';
     };
     upd(); const iv = setInterval(() => { if ($('#modal').hidden || !$('#lastSaveTxt')) clearInterval(iv); else upd(); }, 1000);
-    ['sound', 'vibrate', 'dmgNums', 'particles', 'shake', 'autoBoss', 'offlineModal'].forEach(id => {
+    ['sound', 'music', 'vibrate', 'dmgNums', 'particles', 'shake', 'autoBoss', 'offlineModal'].forEach(id => {
       sh.querySelector('#' + id).addEventListener('change', e => { st[id] = e.target.checked; save(); });
     });
     sh.querySelector('#panelCollapsed').addEventListener('change', e => setPanelCollapsed(e.target.checked));
@@ -1885,6 +2066,8 @@ function doBuy(k) {
   if (k.startsWith('skill')) return buySkill(+k.slice(5));
   if (k.startsWith('art_')) return buyArtifact(ARTIFACTS.find(a => 'art_' + a.id === k));
   if (k.startsWith('ach_')) return claimAch(ACH.find(a => 'ach_' + a.id === k));
+  if (k.startsWith('quest_')) return claimQuest(k.slice(6));
+  if (k === 'questBonus') return claimQuestBonus();
   return false;
 }
 function bindEvents() {
@@ -1931,7 +2114,7 @@ function bindEvents() {
   $('#list').addEventListener('pointerdown', e => {
     const b = e.target.closest('[data-buy]'); if (!b || b.disabled) return;
     const k = b.dataset.buy;
-    if (k === 'prestige' || k.startsWith('ach_')) return;
+    if (k === 'prestige' || k.startsWith('ach_') || k.startsWith('quest')) return;
     holdFired = false;
     stopHold();
     holdTimer = setTimeout(() => {
@@ -1943,6 +2126,7 @@ function bindEvents() {
   $('#list').addEventListener('scroll', stopHold, { passive: true });
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-daily]')) { claimDaily(); updateList(); return; }
+    const rr = e.target.closest('[data-reroll]'); if (rr) { openReroll(+rr.dataset.reroll); return; }
     const b = e.target.closest('[data-buy]'); if (!b) return;
     if (holdFired) { holdFired = false; return; }
     if (b.disabled) return;
@@ -2077,7 +2261,7 @@ function start(hotData) {
     openModal(`<h2>Lâmina Rúnica</h2>
       <p>Toque nos monstros para atacar. Derrote 10 monstros e enfrente o chefe antes que o tempo acabe.</p>
       <p>Use o ouro para subir o nível do herói, contratar criaturas místicas que lutam sozinhas e aprender poderes. Toque nos espíritos que passam voando para ganhar prêmios.</p>
-      <p>A partir do estágio ${PRESTIGE_STAGE}, renasça para ganhar essências e ficar mais forte para sempre. Seu progresso é salvo automaticamente.</p>
+      <p>A cada 10 estágios aparece um Chefe Ancestral. A partir do estágio ${PRESTIGE_STAGE}, renasça para ganhar essências e ficar mais forte para sempre. Seu progresso é salvo automaticamente.</p>
       <div class="btns"><button class="btn primary" data-close>Começar</button></div>`);
     save();
   } else if ($('#modal').hidden) {

@@ -14,6 +14,11 @@ Abra `index.html` no navegador (ou publique a pasta no GitHub Pages).
 - **Poderes**: Raio Celeste, Fúria das Lâminas, Chuva de Ouro e Grito de Guerra. Gastam mana e têm recarga.
 - **Relíquias**: a partir do estágio 40 você pode **Renascer** e ganhar essências. Cada essência dá +10% de dano para sempre e serve para comprar artefatos permanentes.
 - 8 regiões com cenário próprio, monstros gerados proceduralmente e o raro **Baú Vivo**, que solta 12× mais ouro.
+- **Muros com plataformas** nas laterais do mapa: as criaturas mais fortes ficam nelas (2 a 4 por lado, conforme o tamanho da tela). Nos níveis 50, 100 e 200 a criatura evolui de aparência.
+- **Trocar criatura**: toque na imagem do aliado para sortear outra (a primeira troca é grátis, depois custa 1 essência).
+- **Chefe Ancestral** a cada 10 estágios: mais forte, dá o dobro de ouro e +2 essências na primeira vitória.
+- **Missões diárias**: 3 missões por dia com ouro, e um baú de +2 essências ao concluir todas.
+- **Música de fundo** gerada pelo próprio jogo (pode desligar nas configurações).
 - **Espírito Errante**: de tempos em tempos passa voando. Toque nele para ganhar ouro, mana cheia ou um poder grátis.
 - **Combo**: toques rápidos seguidos aumentam o dano em até +40%.
 - **Conquistas** com estrelas que dão essências, e **recompensa diária** com sequência de 7 dias.
