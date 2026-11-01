@@ -26,6 +26,33 @@ Abra `index.html` no navegador (ou publique a pasta no GitHub Pages).
 - Painel recolhível (seta ao lado das abas) e opção de tela cheia para aumentar a área de batalha.
 - Atalhos no computador: `Espaço` ataca, `1` a `4` usam os poderes.
 
+## Equipamentos
+
+O herói tem 4 espaços: **Espada** (dano de toque), **Chapéu** (todo o dano), **Roupa** (dano dos aliados) e **Anel** (ouro).
+Cada item muda a aparência do herói (5 espadas, 5 chapéus, 4 roupas e 3 anéis, com cor e brilho da raridade).
+
+| Raridade | Chefe comum | Chefe Ancestral | Bônus base |
+| --- | --- | --- | --- |
+| Comum | 55% | 0% | 10% |
+| Incomum | 25% | 40% | 20% |
+| Raro | 12% | 30% | 40% |
+| Épico | 5,5% | 18% | 80% |
+| Lendário | 2% | 9% | 160% |
+| Mítico | 0,5% | 3% | 320% |
+
+- Chance de item: 25% por chefe, 100% no Chefe Ancestral e 15% no Baú Vivo.
+- O nível do item acompanha o estágio (−2 a +3; Ancestral +5). 8% dos itens são **Excepcionais**, com 10 a 20 níveis a mais.
+- O bônus cresce com o nível: `bônus = base × (1 + nível/10) × (1 + 0,1 × melhorias)`.
+- Raro ou melhor ganha um bônus secundário (crítico, dano crítico, mana, tempo contra chefes ou ouro).
+- **Sorte acumulada**: cada item sem Lendário aumenta a chance de Lendário e Mítico, e o 40º é garantido.
+- Itens desmanchados viram fragmentos, que melhoram o item equipado (+10% por nível). Há desmanche automático opcional.
+
+## Ranks dos aliados
+
+A cada 25 níveis o aliado ganha uma estrela. A cada 5 estrelas o rank muda de cor:
+Bronze → Prata → Ouro → Esmeralda → Safira → Ametista → Rubi → Celestial (cor animada).
+As estrelas aparecem na lista e na plataforma de cada criatura. A partir de Ouro, a criatura ganha uma coroa.
+
 ## Salvamento
 
 - **Automático** a cada 5, 10, 30 ou 60 s (configurável), ao comprar algo, ao vencer um chefe e ao sair ou trocar de aba.
