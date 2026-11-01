@@ -3346,13 +3346,65 @@ function restoreSafety(reason, label) {
       });
     });
 }
-const SAFETY_LABELS = { import: 'progresso de antes da última importação', reset: 'progresso apagado', cloud: 'progresso deste aparelho de antes da nuvem', cloudRemote: 'cópia da nuvem não usada', repair: 'save original antes das correções automáticas', recover: 'melhor cópia de antes do novo jogo' };
+const SAFETY_LABELS = { auto: 'progresso de antes de restaurar uma cópia automática', import: 'progresso de antes da última importação', reset: 'progresso apagado', cloud: 'progresso deste aparelho de antes da nuvem', cloudRemote: 'cópia da nuvem não usada', repair: 'save original antes das correções automáticas', recover: 'melhor cópia de antes do novo jogo' };
+
+// Cópias automáticas guardadas neste navegador (backup + cópias rotativas), da mais nova para a mais antiga.
+function autoCopies() {
+  const out = [];
+  const add = (source, label, text) => {
+    if (!text) return;
+    const r = decodeSave(text);
+    if (r.ok) out.push({ source, label, r, at: peekSave(text).at || r.state.lastSave || 0 });
+  };
+  add('backup', 'Backup (salvamento anterior)', Store.get(BACKUP_KEY));
+  for (let i = 0; i < SNAP_COUNT; i++) add('snap' + i, 'Cópia automática', Store.get(SNAP_KEY + i));
+  return out.sort((a, b) => b.at - a.at);
+}
+function restoreAuto(source) {
+  const c = autoCopies().find(x => x.source === source);
+  if (!c) { toast('Essa cópia não está mais disponível.', 'bad'); return; }
+  openModal(`<h2>Restaurar esta cópia?</h2>
+    <p>${esc(c.label)} de ${esc(fmtDate(c.at))}. O progresso atual fica guardado em “Cópias de segurança”, então a troca pode ser desfeita.</p>
+    ${summaryCard('Progresso atual', saveSummary(S))}${summaryCard('Cópia', saveSummary(c.r.state))}
+    <div class="btns"><button class="btn primary" id="okAuto">Restaurar</button><button class="btn" data-close>Cancelar</button></div>`,
+    sh => {
+      const ok = sh.querySelector('#okAuto');
+      ok.addEventListener('click', () => {
+        if (ok.disabled) return; ok.disabled = true;
+        const cur = serialize();
+        writeSafety('auto', cur);
+        applyState(c.r.state, { snapshot: true });
+        cloudSave(); closeModal(); toast('Progresso restaurado!', 'gold');
+      });
+    });
+}
+// Ao abrir: se houver neste navegador uma cópia com muito mais progresso que o save atual, oferece restaurar.
+const BETTER_DISMISS_KEY = 'laminaRunica.betterDismissed';
+function checkBetterCopy(tries = 0) {
+  if (saveBlock) return;
+  if (!$('#modal').hidden) { if (tries < 10) setTimeout(() => checkBetterCopy(tries + 1), 2500); return; }
+  const best = autoCopies().filter(c => c.r.state.maxStage >= S.maxStage + 10).sort((a, b) => b.r.state.maxStage - a.r.state.maxStage)[0];
+  if (!best || Store.get(BETTER_DISMISS_KEY) === String(best.at)) return;
+  openModal(`<h2>Encontramos um progresso maior</h2>
+    <p>Este navegador tem uma cópia automática mais avançada que o jogo atual. Quer voltar para ela?</p>
+    ${summaryCard('Jogo atual', saveSummary(S))}${summaryCard('Cópia encontrada', saveSummary(best.r.state))}
+    <div class="btns"><button class="btn primary" id="okBetter">Restaurar a cópia</button><button class="btn" id="noBetter">Manter o jogo atual</button></div>`,
+    sh => {
+      sh.querySelector('#okBetter').addEventListener('click', () => {
+        writeSafety('auto', serialize());
+        applyState(best.r.state, { snapshot: true });
+        cloudSave(); closeModal(); toast('Progresso restaurado!', 'gold');
+      });
+      sh.querySelector('#noBetter').addEventListener('click', () => { Store.set(BETTER_DISMISS_KEY, String(best.at)); closeModal(); });
+    });
+}
 
 function openSettings() {
   const st = S.settings;
   const sw = (id, label, hint) => `<div class="setRow"><label for="${id}">${label}${hint ? `<small>${hint}</small>` : ''}</label><input type="checkbox" class="switch" id="${id}" ${st[id] ? 'checked' : ''}></div>`;
   const range = (id, label, v) => `<div class="setRow"><label for="${id}">${label}</label><input type="range" id="${id}" min="0" max="1" step="0.05" value="${v}"></div>`;
   const safeties = Object.keys(SAFETY_LABELS).map(k => [k, readSafety(k)]).filter(([, o]) => o);
+  const autos = autoCopies();
   openModal(`
     <h2>Configurações</h2>
     <div class="sectionLabel">Som e toque</div>
@@ -3392,6 +3444,10 @@ function openSettings() {
     </div>
     ${safeties.length ? `<div class="sectionLabel">Cópias de segurança guardadas</div>
       ${safeties.map(([k, o]) => `<div class="setRow"><label>${esc(SAFETY_LABELS[k][0].toUpperCase() + SAFETY_LABELS[k].slice(1))}<small>${esc(fmtDate(o.at))}</small></label><button class="btn" data-restore="${k}">Restaurar</button></div>`).join('')}` : ''}
+    <div class="sectionLabel">Cópias automáticas neste navegador</div>
+    ${autos.length ? autos.map(c => { return `<div class="setRow"><label>${esc(c.label)}<small>${esc(fmtDate(c.at))} · estágio ${esc(String(c.r.state.stage))} · recorde ${esc(String(c.r.state.maxStage))} · ${esc(String(c.r.state.essTotal))} essências</small></label><button class="btn" data-restoreauto="${c.source}">Restaurar</button></div>`; }).join('')
+      : '<p class="muted">Nenhuma cópia automática guardada ainda. O jogo guarda uma a cada 10 minutos de jogo.</p>'}
+    <p class="muted">O progresso fica só neste navegador. Outro navegador, outro aparelho, o app em vez do site, a janela anônima ou a limpeza dos dados do site começam um jogo separado. Para não perder nada, guarde um código de backup de vez em quando.</p>
     <div class="sectionLabel">Zona de perigo</div>
     <div class="btns"><button class="btn danger" id="resetBtn">Apagar todo o progresso</button></div>
     <p class="muted">Ao apagar, uma cópia do progresso atual fica guardada nesta tela e pode ser restaurada.</p>
@@ -3451,6 +3507,7 @@ function openSettings() {
       const rd = new FileReader(); rd.onload = () => tryImport(String(rd.result)); rd.onerror = () => toast('Não foi possível ler o arquivo.', 'bad'); rd.readAsText(f);
     });
     sh.querySelectorAll('[data-restore]').forEach(b => b.addEventListener('click', () => restoreSafety(b.dataset.restore, SAFETY_LABELS[b.dataset.restore])));
+    sh.querySelectorAll('[data-restoreauto]').forEach(b => b.addEventListener('click', () => restoreAuto(b.dataset.restoreauto)));
     const rb = sh.querySelector('#resetBtn');
     rb.addEventListener('click', () => {
       if (!rb.classList.contains('armed')) {
@@ -3768,6 +3825,7 @@ function start(hotData) {
   // Ganchos de teste: só existem com #teste no endereço. Não dão poder que o próprio navegador já não dê ao jogador.
   if (location.hash === '#teste') window.__lr = { get S() { return S; }, spawnWisp, wispPos, get wisp() { return wisp; }, rollRarity, makeItem, grantItem, bossDrop, equipItem,
     save, Session, Store, get saveBlock() { return saveBlock; }, get foe() { return foe; }, killFoe, bossEscaped, challengeBoss, prestige, salvageItem, claimQuest, claimDaily, claimAch, ACH, exportCode, tryImport, doTap };
+  if (!fresh && !saveBlock) setTimeout(() => checkBetterCopy(), 1800);
   lastTick = performance.now();
   requestAnimationFrame(frame);
   cloudInit();

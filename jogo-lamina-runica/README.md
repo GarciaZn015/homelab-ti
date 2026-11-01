@@ -82,6 +82,12 @@ As estrelas aparecem na lista e na plataforma de cada criatura. A partir de Ouro
 - **Exportar e importar**: em Configurações, gere um código `LR1.…` (ou baixe um arquivo). Ao importar, o jogo mostra um resumo dos dois progressos, guarda uma cópia do atual e só então troca. A cópia aparece em **Cópias de segurança guardadas** e pode ser restaurada. Códigos antigos continuam válidos.
 - **Apagar progresso** pede confirmação dupla e guarda uma cópia restaurável.
 
+### Recuperar progresso
+
+- Em **Configurações → Cópias automáticas neste navegador** aparecem o backup e as até 3 cópias automáticas (uma a cada 10 min de jogo), com estágio, recorde, essências e data. Qualquer uma pode ser restaurada; o progresso atual fica guardado e a troca pode ser desfeita.
+- Ao abrir o jogo, se este navegador tiver uma cópia com 10 ou mais estágios de recorde acima do jogo atual, o jogo oferece restaurá-la.
+- Se o navegador não tiver nenhum dado do jogo (outro navegador, outro aparelho, app em vez do site, janela anônima ou dados do site apagados), não há o que recuperar ali: o progresso só existe onde foi jogado, ou num código de backup.
+
 ### Link compartilhado × progresso
 
 O progresso fica no armazenamento do navegador (`localStorage`), separado por navegador, perfil e endereço do site.
