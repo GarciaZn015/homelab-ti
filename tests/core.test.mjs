@@ -29,11 +29,11 @@ test('2/3. save real da versão 4 (gerado pelo código original) carrega e migra
   const raw4 = representativeV4(old), v4 = plain(raw4);
   const st = fakeStorage();
   st.setItem('laminaRunica.save.v1', old.serializeOf(raw4));
-  const { L } = newGame(st);
+  const { L, api } = newGame(st);
   assert.equal(L.kind, 'ok');
   const s = plain(L.res.state);
   assert.deepEqual(plain(L.res.fixes), [], 'save legítimo não pode sofrer correções');
-  assert.equal(s.v, 5);
+  assert.equal(s.v, api.consts.VERSION);
   for (const k of ['gold', 'stage', 'wave', 'maxStage', 'runMaxStage', 'bossFailed', 'farmKills', 'hero', 'ess', 'essTotal', 'prestiges', 'ancientBest', 'frags', 'pity', 'mana', 'clock', 'created', 'lastSave'])
     assert.deepEqual(s[k], v4[k], k);
   assert.deepEqual(s.allies, v4.allies);
@@ -43,7 +43,8 @@ test('2/3. save real da versão 4 (gerado pelo código original) carrega e migra
   assert.deepEqual(s.ach, v4.ach);
   assert.deepEqual(s.daily, v4.daily);
   assert.deepEqual(s.quests, v4.quests);
-  assert.deepEqual(s.stats, v4.stats);
+  for (const k of Object.keys(v4.stats)) assert.deepEqual(s.stats[k], v4.stats[k], 'stats.' + k);   // nada antigo muda
+  for (const k of Object.keys(s.stats)) if (!(k in v4.stats)) assert.equal(s.stats[k], 0, 'stats novo ' + k);  // campos novos começam em 0
   assert.deepEqual(s.equip, plain(v4.equip));
   assert.deepEqual(s.inv, plain(v4.inv));
   assert.equal(s.settings.notation, 'sci');
@@ -76,7 +77,7 @@ test('4. gravação: envelope com versão/revisão, backup recebe o principal an
   assert.equal(r2.ok, true);
   assert.equal(r2.rev, 2);
   const env = JSON.parse(st.getItem(api.consts.SAVE_KEY));
-  assert.equal(env.fmt, 2); assert.equal(env.v, 5); assert.equal(env.rev, 2); assert.ok(env.at > 0); assert.ok(env.tab);
+  assert.equal(env.fmt, 2); assert.equal(env.v, api.consts.VERSION); assert.equal(env.rev, 2); assert.ok(env.at > 0); assert.ok(env.tab);
   assert.equal(st.getItem(api.consts.BACKUP_KEY), first);
   assert.ok(st.getItem(api.consts.SNAP_KEY + '0'), 'primeira gravação da sessão cria cópia rotativa');
 });
@@ -330,4 +331,28 @@ test('cópias de segurança nomeadas: gravam e leem sem interferir no principal'
   assert.equal(api.readSafety('import').save, main);
   assert.equal(api.readSafety('nada'), null);
   assert.equal(api.chooseLoad().kind, 'ok', 'cópias nomeadas não disparam recuperação');
+});
+
+test('talentos: ids desconhecidos removidos, níveis acima do máximo limitados, talentos válidos intactos', () => {
+  const { api } = newGame(fakeStorage());
+  const s = plain(api.defaults());
+  s.talents = { afiado: 4, celestial: 99, inventado: 3, lince: -2 };
+  const r = api.fromRawChecked(s);
+  assert.deepEqual(plain(r.state.talents), { afiado: 4, celestial: 3, lince: 0 });
+  assert.ok(r.fixes.includes('talents'));
+  const ok = plain(api.defaults()); ok.talents = { afiado: 2, poco: 10 }; ok.mana = 200;
+  const r2 = api.fromRawChecked(ok);
+  assert.deepEqual(plain(r2.fixes), [], 'mana acima de 100 vale com Poço de Mana');
+  assert.equal(r2.state.mana, 200);
+});
+
+test('Códice das Almas multiplica as essências do renascimento', () => {
+  const { api } = newGame(fakeStorage());
+  const s = api.defaults(); s.runMaxStage = 80; s.maxStage = 80; s.stage = 80;
+  api.setS(s);
+  const base = api.essGain();
+  assert.ok(base > 0);
+  s.arts.codice = 3;
+  assert.equal(api.essGain(), Math.floor(Math.pow((80 - 25) / 2, 1.25) * (1 + 0.6)));
+  assert.ok(api.essGain() > base);
 });

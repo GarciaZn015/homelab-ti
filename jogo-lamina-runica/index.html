@@ -109,8 +109,22 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .odds span:nth-child(3n+2), .odds span:nth-child(3n) { text-align: right; }
 .odds .h { color: var(--muted); font-weight: 900; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
 .dimStar { color: #4a4470; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+.seg button { border: 0; background: none; border-radius: 9px; padding: 7px; font-weight: 900; color: var(--muted); }
+.seg button.on { background: var(--panel-2); color: var(--gold); }
+.brs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.brs button { border: 1px solid var(--line); border-top: 3px solid var(--bc); background: var(--panel-2); border-radius: 10px; padding: 6px 2px; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
+.brs button b { font-size: 12px; color: var(--bc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.brs button small { font-size: 10px; color: var(--muted); font-weight: 800; }
+.brs button.on { background: color-mix(in srgb, var(--bc) 18%, var(--panel-2)); border-color: var(--bc); }
+.tierHead { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 900; color: var(--muted); margin-top: 4px; }
+.tierHead .node { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--line); color: var(--muted); font-size: 11px; flex: 0 0 auto; }
+.tierHead .node.open { border-color: var(--bc); color: var(--bc); box-shadow: 0 0 10px -2px var(--bc); }
+.tierBody { display: flex; flex-direction: column; gap: 6px; margin-left: 10px; padding-left: 14px; border-left: 2px solid color-mix(in srgb, var(--bc) 45%, transparent); }
+.buy.tal { background: linear-gradient(180deg, #bfe9ff, var(--mana)); color: #062a44; box-shadow: 0 3px 0 #2a6a9a; }
+.tal .av, .tierBody .av { color: #160f2a; }
 .bar.timer > i { background: linear-gradient(90deg, var(--danger), var(--gold)); }
-#dpsTag { position: absolute; left: max(10px, env(safe-area-inset-left, 0px)); bottom: 8px; font-size: 11px; font-weight: 800; color: var(--muted); background: rgba(10,8,25,.6); padding: 4px 8px; border-radius: 8px; pointer-events: none; font-variant-numeric: tabular-nums; max-width: 62%; }
+#dpsTag { position: absolute; left: max(10px, env(safe-area-inset-left, 0px)); bottom: 8px; font-size: 11px; font-weight: 800; color: var(--muted); background: rgba(10,8,25,.6); padding: 4px 8px; border-radius: 8px; pointer-events: none; font-variant-numeric: tabular-nums; max-width: 80%; }
 #dpsTag b { color: var(--text); }
 #btnBoss { position: absolute; right: max(10px, env(safe-area-inset-right, 0px)); bottom: 8px; border: 0; border-radius: 12px; padding: 9px 14px; background: linear-gradient(180deg, #ff7d88, #c9334a); font-family: var(--f-display); font-size: 13px; box-shadow: 0 4px 0 #7a1d2c; animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(1.06); } }
@@ -328,7 +342,7 @@ const SAVE_FMT = 2;                               // formato do envelope (1 = s�
 const MAX_SAVE_CHARS = 1500000;
 const MAX_CODE_CHARS = 2500000;
 const MAX_NUM = 1e305;                            // teto para nunca virar Infinity (JSON grava Infinity como null)
-const VERSION = 5;
+const VERSION = 6;
 const INV_MAX = 40;
 const PITY = 40;            // chefes com item sem Lendário até um Lendário garantido
 const DROP_BOSS = 0.25;     // chance de item por chefe comum (Ancestral: 100%)
@@ -382,6 +396,47 @@ const SKILLS = [
 const SKILL_MAX = 15;
 function skillPower(i, l) { return i === 0 ? 20 + 12 * (l - 1) : 1.5 + 0.5 * l; }
 
+const CODEX_STEP = 20;      // Códice das Almas: +20% de essências por nível (custo cresce ×1,9 por nível)
+
+/* ---------- árvore de talentos ----------
+   Pontos: 1 a cada 5 estágios de recorde (maxStage) + 2 por renascimento. Ficam para sempre.
+   Um nível só abre depois de gastar pontos no mesmo ramo (TIER_REQ). Custo por nível: TIER_COST do nível. */
+const TALENT_BRANCHES = [
+  { id: 'lamina',    name: 'Lâmina',    color: '#ff8a5a', desc: 'toque e golpes críticos' },
+  { id: 'bestiario', name: 'Bestiário', color: '#7ee08a', desc: 'criaturas aliadas' },
+  { id: 'arcano',    name: 'Arcano',    color: '#55c8ff', desc: 'mana e poderes' },
+  { id: 'fortuna',   name: 'Fortuna',   color: '#ffc94a', desc: 'ouro, espíritos e itens' },
+];
+const TIER_REQ = [0, 5, 15, 25];
+const TIER_COST = [1, 2, 3, 4];
+const fmtD = v => String(+v.toFixed(1)).replace('.', ',');
+const TALENTS = [
+  { id: 'afiado',     br: 'lamina',    tier: 0, max: 10, name: 'Golpe Afiado',         fx: l => `+${25 * l}% de dano de toque` },
+  { id: 'lince',      br: 'lamina',    tier: 0, max: 10, name: 'Olhos de Lince',       fx: l => `+${l}% de chance de crítico` },
+  { id: 'ritmo',      br: 'lamina',    tier: 1, max: 5,  name: 'Ritmo de Batalha',     fx: l => `Combo máximo de +${40 + 10 * l}% (era +40%)` },
+  { id: 'execucao',   br: 'lamina',    tier: 1, max: 10, name: 'Execução',             fx: l => `+${20 * l}% de dano contra chefes` },
+  { id: 'fantasma',   br: 'lamina',    tier: 2, max: 5,  name: 'Lâmina Fantasma',      fx: l => `Uma lâmina ataca sozinha ${l} ${l > 1 ? 'vezes' : 'vez'} por segundo` },
+  { id: 'golpefinal', br: 'lamina',    tier: 3, max: 5,  name: 'Golpe Final',          fx: l => `+${50 * l}% de dano crítico` },
+  { id: 'laco',       br: 'bestiario', tier: 0, max: 10, name: 'Laço Místico',         fx: l => `+${25 * l}% de dano dos aliados` },
+  { id: 'treinador',  br: 'bestiario', tier: 0, max: 10, name: 'Treinador',            fx: l => `Aliados ${2 * l}% mais baratos` },
+  { id: 'matilha',    br: 'bestiario', tier: 1, max: 5,  name: 'Matilha',              fx: l => `+${l}% de dano dos aliados por aliado no grupo` },
+  { id: 'gritoanc',   br: 'bestiario', tier: 1, max: 5,  name: 'Brado Ancestral',      fx: l => `Grito de Guerra dura +${5 * l} s` },
+  { id: 'selvagem',   br: 'bestiario', tier: 2, max: 5,  name: 'Fúria Selvagem',       fx: l => `Aliados causam +${30 * l}% de dano em chefes` },
+  { id: 'celestial',  br: 'bestiario', tier: 3, max: 3,  name: 'Despertar Celestial',  fx: l => `Dano dos aliados ×${1 + l}` },
+  { id: 'poco',       br: 'arcano',    tier: 0, max: 10, name: 'Poço de Mana',         fx: l => `+${10 * l} de mana máxima` },
+  { id: 'fluxo',      br: 'arcano',    tier: 0, max: 10, name: 'Fluxo Arcano',         fx: l => `+${fmtD(0.1 * l)} mana/s` },
+  { id: 'eco',        br: 'arcano',    tier: 1, max: 10, name: 'Eco do Trovão',        fx: l => `Raio Celeste causa +${30 * l}% de dano` },
+  { id: 'foco',       br: 'arcano',    tier: 1, max: 10, name: 'Foco',                 fx: l => `Poderes recarregam ${4 * l}% mais rápido` },
+  { id: 'tempestade', br: 'arcano',    tier: 2, max: 5,  name: 'Tempestade de Lâminas', fx: l => `Fúria das Lâminas ataca +${2 * l} vezes por segundo` },
+  { id: 'arquimago',  br: 'arcano',    tier: 3, max: 5,  name: 'Arquimago',            fx: l => `Poderes duram +${10 * l}%` },
+  { id: 'bolsos',     br: 'fortuna',   tier: 0, max: 10, name: 'Bolsos Fundos',        fx: l => `+${20 * l}% de ouro` },
+  { id: 'faro',       br: 'fortuna',   tier: 0, max: 6,  name: 'Faro de Tesouro',      fx: l => `Baú Vivo: ${fmtD(3 + 0.5 * l)}% dos monstros (era 3%)` },
+  { id: 'espiritos',  br: 'fortuna',   tier: 1, max: 5,  name: 'Amigo dos Espíritos',  fx: l => `Espíritos ${8 * l}% mais frequentes e +${20 * l}% de prêmio` },
+  { id: 'noturna',    br: 'fortuna',   tier: 1, max: 5,  name: 'Coleta Noturna',       fx: l => `+${20 * l}% de ouro enquanto você está fora` },
+  { id: 'cacador',    br: 'fortuna',   tier: 2, max: 10, name: 'Caçador de Relíquias', fx: l => `Chefes soltam item em ${25 + 3 * l}% das vezes (era 25%)` },
+  { id: 'sorte',      br: 'fortuna',   tier: 3, max: 5,  name: 'Sorte Grande',         fx: l => `Lendário garantido no ${PITY - 2 * l}º item (era ${PITY}º)` },
+];
+
 const ARTIFACTS = [
   { id: 'elmo',   name: 'Elmo do Primeiro Rei', base: 1, growth: 1.55, max: 0,  color: '#ffd84a', desc: l => `+${50 * l}% de todo o dano` },
   { id: 'bolsa',  name: 'Bolsa sem Fundo',      base: 1, growth: 1.6,  max: 0,  color: '#ffb84a', desc: l => `+${30 * l}% de ouro` },
@@ -391,6 +446,7 @@ const ARTIFACTS = [
   { id: 'ampu',   name: 'Ampulheta Partida',    base: 3, growth: 1.8,  max: 10, color: '#c7b8ff', desc: l => `+${3 * l} s no tempo contra chefes` },
   { id: 'calice', name: 'Cálice de Mana',       base: 2, growth: 1.7,  max: 20, color: '#55c8ff', desc: l => `+${15 * l} de mana máxima e +${(0.15 * l).toFixed(2).replace('.', ',')} mana/s` },
   { id: 'lanter', name: 'Lanterna dos Espíritos', base: 3, growth: 1.8, max: 10, color: '#fff3a8', desc: l => `Espíritos errantes aparecem ${10 * l}% mais rápido e dão +${50 * l}% de recompensa` },
+  { id: 'codice', name: 'Códice das Almas',      base: 4, growth: 1.9, max: 0,  color: '#e8b5ff', desc: l => `+${CODEX_STEP * l}% de essências ao renascer` },
 ];
 
 const ACH = [
@@ -473,12 +529,12 @@ function defaults() {
     gold: 0, stage: 1, wave: 0, maxStage: 1, runMaxStage: 1, bossFailed: false, farmKills: 0,
     hero: 1, allies: ALLIES.map(() => 0), allyForms: randomForms(),
     skills: SKILLS.map(() => ({ lvl: 0, until: 0, cd: 0 })), mana: 50,
-    ess: 0, essTotal: 0, arts: {}, prestiges: 0, ach: {}, ancientBest: 0,
+    ess: 0, essTotal: 0, arts: {}, prestiges: 0, ach: {}, ancientBest: 0, talents: {},
     equip: { sword: null, hat: null, armor: null, ring: null }, inv: [], frags: 0, pity: 0, nextItemId: 1,
     daily: { last: '', streak: 0 },
     quests: { day: '', bonus: false, q0: { type: '', goal: 0, prog: 0, done: false }, q1: { type: '', goal: 0, prog: 0, done: false }, q2: { type: '', goal: 0, prog: 0, done: false } },
     stats: { taps: 0, crits: 0, kills: 0, bosses: 0, chests: 0, gold: 0, skills: 0, maxTap: 0, maxCombo: 0, wisps: 0,
-      active: 0, open: 0, offline: 0, rerolls: 0, quests: 0, items: 0, legend: 0 },
+      active: 0, open: 0, offline: 0, rerolls: 0, quests: 0, items: 0, legend: 0, respecs: 0 },
     settings: {
       sound: true, volume: 0.6, vibrate: true, dmgNums: true, particles: true, shake: true,
       notation: 'letters', autosave: 10, autoBoss: true, buyQty: 1, offlineModal: true, panelCollapsed: false, music: true, autoSalvage: 0,
@@ -516,6 +572,7 @@ const MIGRATIONS = {
   3: () => {},                                                                            // v3 e v4 só acrescentaram campos
   4: () => {},
   5: raw => { if (!(+raw.wallMax > 0)) raw.wallMax = +raw.lastSave || 0; },               // v5: maior horário já registrado
+  6: () => {},                                                                            // v6: talentos e Códice das Almas (campos novos)
 };
 function migrate(raw) {
   const from = Math.max(1, Math.floor(+raw.v) || 1);
@@ -568,7 +625,12 @@ function sanitizeState(m, raw, fixes) {
     num(m.ach, k, 0, A.goals.length, true, 'ach');
   }
   m.skills.forEach(st => { num(st, 'lvl', 0, SKILL_MAX, true, 'skills'); num(st, 'until', -1e12, 1e12, false, 'skills'); num(st, 'cd', -1e12, 1e12, false, 'skills'); });
-  num(m, 'mana', 0, 100 + 15 * (m.arts.calice || 0), false);
+  for (const k of Object.keys(m.talents)) {
+    const T = TALENTS.find(t => t.id === k);
+    if (!T) { delete m.talents[k]; fixes.push('talents'); continue; }
+    num(m.talents, k, 0, T.max, true, 'talents');
+  }
+  num(m, 'mana', 0, 100 + 15 * (m.arts.calice || 0) + 10 * (m.talents.poco || 0), false);
   num(m, 'frags', 0, 1e15, true); num(m, 'pity', 0, PITY - 1, true);
   num(m, 'clock', 0, 1e12, false);
   for (const k of ['created', 'lastSave', 'wallMax']) num(m, k, 0, 1e14, false);
@@ -1000,18 +1062,38 @@ function todayKey(d = new Date()) { return `${d.getFullYear()}-${String(d.getMon
    FÓRMULAS DO JOGO
    ========================================================= */
 const art = id => S.arts[id] || 0;
+const tal = id => (S.talents && S.talents[id]) || 0;
+function talentPointsTotal() { return Math.floor(S.maxStage / 5) + 2 * S.prestiges; }
+function talentSpentIn(br) { let n = 0; for (const T of TALENTS) if (!br || T.br === br) n += tal(T.id) * TIER_COST[T.tier]; return n; }
+function talentPointsFree() { return Math.max(0, talentPointsTotal() - talentSpentIn()); }
+function talentUnlocked(T) { return talentSpentIn(T.br) >= TIER_REQ[T.tier]; }
+function talentCanLearn(T) { return tal(T.id) < T.max && talentUnlocked(T) && talentPointsFree() >= TIER_COST[T.tier]; }
+function hiredCount() { return S.allies.filter(l => l > 0).length; }
+function pityMax() { return PITY - 2 * tal('sorte'); }
+function allyBaseCost(i) { return ALLIES[i].cost * (1 - 0.02 * tal('treinador')); }
+function skillCd(i) { return SKILLS[i].cd * (1 - 0.04 * tal('foco')); }
+function skillDur(i, lvl) {
+  const base = SKILLS[i].dur(lvl);
+  if (!base) return 0;
+  return (base + (i === 3 ? 5 * tal('gritoanc') : 0)) * (1 + 0.1 * tal('arquimago'));
+}
 function gainGold(g) { if (!(g > 0)) return; S.gold = addCapped(S.gold, g); S.stats.gold = addCapped(S.stats.gold, g); }
 const skillActive = i => S.skills[i].until > S.clock;
 
 function zoneOf(stage) { return ZONES[Math.floor((stage - 1) / 10) % ZONES.length]; }
-function hpFor(stage) { return Math.min(1e300, 10 * Math.pow(1.5, stage - 1)); }
-function goldFor(stage) { return Math.max(1, hpFor(stage) / 6); }
+// Equilíbrio (revisado em 01/11/2026 com simulação): vida ×1,55 por estágio, ouro = vida/15.
+function hpFor(stage) { return Math.min(1e300, 10 * Math.pow(1.55, stage - 1)); }
+function goldFor(stage) { return Math.max(1, hpFor(stage) / 15); }
+const ENTRY_TIME = 0.3;      // os aliados só atacam depois que o monstro termina de entrar
+const FAST_RATIO = 10;       // aliados matam em menos de 0,1 s → avanço rápido
+const FAST_STEP = 4;         // cada vitória no avanço rápido conta 4 monstros
+function fastAdvance() { return dps(false) >= FAST_RATIO * hpFor(S.stage); }
 
-function itemMain(it) { return it ? RARITIES[it.rar].base * SLOT_DEF[it.slot].k * (1 + it.lvl / 10) * (1 + 0.1 * it.up) : 0; }
+function itemMain(it) { return it ? RARITIES[it.rar].base * SLOT_DEF[it.slot].k * (1 + it.lvl / 40) * (1 + 0.1 * it.up) : 0; }
 function eqPct(slot) { return itemMain(S.equip[slot]); }
 function secTotal(type) { let t = 0; for (const k of SLOT_KEYS) { const it = S.equip[k]; if (it && it.sec && it.sec.type === type) t += it.sec.val; } return t; }
 function dmgMult() { return (1 + 0.1 * S.essTotal) * (1 + 0.5 * art('elmo')) * (1 + eqPct('hat') / 100); }
-function goldBase() { return (1 + 0.3 * art('bolsa')) * (1 + eqPct('ring') / 100) * (1 + secTotal('gold') / 100); }
+function goldBase() { return (1 + 0.3 * art('bolsa')) * (1 + eqPct('ring') / 100) * (1 + secTotal('gold') / 100) * (1 + 0.2 * tal('bolsos')); }
 function goldMult() {
   let m = goldBase();
   if (skillActive(2)) m *= skillPower(2, S.skills[2].lvl);
@@ -1020,20 +1102,20 @@ function goldMult() {
 function allyMult(l) { return l <= 0 ? 0 : (l >= 10 ? 2 : 1) * Math.pow(4, Math.floor(l / 25)); }
 function allyDps(i, l = S.allies[i]) { return ALLIES[i].dps * l * allyMult(l); }
 function baseDps() { let t = 0; for (let i = 0; i < ALLIES.length; i++) t += allyDps(i); return t; }
-function allyFactor() { return dmgMult() * (1 + 0.6 * art('tambor')) * (1 + eqPct('armor') / 100); }
+function allyFactor() { return dmgMult() * (1 + 0.6 * art('tambor')) * (1 + eqPct('armor') / 100) * (1 + 0.25 * tal('laco')) * (1 + 0.01 * tal('matilha') * hiredCount()) * (1 + tal('celestial')); }
 function dps(withSkill = true) {
   let d = baseDps() * allyFactor();
   if (withSkill && skillActive(3)) d *= skillPower(3, S.skills[3].lvl);
   return d;
 }
-function heroMult(l) { return Math.pow(1.75, Math.floor(l / 10)); }
+function heroMult(l) { return Math.pow(1.6, Math.floor(l / 10)); }
 function heroBase(l = S.hero) { return l * heroMult(l); }
-function comboMult() { return 1 + Math.min(combo.n, 100) * 0.004; }
-function tapDmg() { return (heroBase() * dmgMult() + dps() * 0.04) * (1 + 0.75 * art('brac')) * (1 + eqPct('sword') / 100); }
-function critChance() { return Math.min(0.6, 0.03 + 0.015 * art('olho') + secTotal('critC') / 100); }
-function critMult() { return (4 + 0.5 * art('olho')) * (1 + secTotal('critD') / 100); }
-function manaMax() { return 100 + 15 * art('calice'); }
-function manaRegen() { return 0.5 + 0.15 * art('calice') + secTotal('mana'); }
+function comboMult() { return 1 + Math.min(combo.n, 100) * (0.004 + 0.001 * tal('ritmo')); }
+function tapDmg() { return (heroBase() * dmgMult() + dps() * 0.04) * (1 + 0.75 * art('brac')) * (1 + eqPct('sword') / 100) * (1 + 0.25 * tal('afiado')); }
+function critChance() { return Math.min(0.6, 0.03 + 0.015 * art('olho') + secTotal('critC') / 100 + 0.01 * tal('lince')); }
+function critMult() { return (4 + 0.5 * art('olho')) * (1 + secTotal('critD') / 100) * (1 + 0.5 * tal('golpefinal')); }
+function manaMax() { return 100 + 15 * art('calice') + 10 * tal('poco'); }
+function manaRegen() { return 0.5 + 0.15 * art('calice') + secTotal('mana') + 0.1 * tal('fluxo'); }
 function bossTime() { return 30 + 3 * art('ampu') + secTotal('boss'); }
 function goldPerSec() {
   const d = dps(); if (d <= 0) return 0;
@@ -1049,13 +1131,13 @@ function allyRank(l) {
 
 const HERO_C0 = 5, HERO_G = 1.075, ALLY_G = 1.07;
 function heroCost(n) { return costN(HERO_C0, HERO_G, S.hero - 1, n); }
-function allyCost(i, n) { return costN(ALLIES[i].cost, ALLY_G, S.allies[i], n); }
+function allyCost(i, n) { return costN(allyBaseCost(i), ALLY_G, S.allies[i], n); }
 function skillCost(i) { return SKILLS[i].base * Math.pow(20, S.skills[i].lvl); }
 function artCost(a) { return Math.ceil(a.base * Math.pow(a.growth, art(a.id))); }
 function essGain() {
   const s = S.runMaxStage;
   if (s < PRESTIGE_STAGE) return 0;
-  return Math.floor(Math.pow((s - 25) / 2, 1.25));
+  return Math.floor(Math.pow((s - 25) / 2, 1.25) * (1 + CODEX_STEP / 100 * art('codice')));
 }
 
 /* =========================================================
@@ -1282,7 +1364,7 @@ function spawn(forceBoss) {
   const boss = forceBoss || (S.wave >= WAVES - 1 && !S.bossFailed);
   const seed = (S.stage * 7919 + S.wave * 104729 + Math.floor(Math.random() * 1e6)) >>> 0;
   const r = rng(seed);
-  const chest = !boss && S.stage >= 3 && Math.random() < 0.03;
+  const chest = !boss && S.stage >= 3 && Math.random() < 0.03 + 0.005 * tal('faro');
   const ancient = boss && S.stage % 10 === 0;
   const shiny = !boss && !chest && Math.random() < 0.02;      // variante rara: só aparência, mesma recompensa
   const zone = zoneOf(S.stage);
@@ -1299,7 +1381,8 @@ function spawn(forceBoss) {
     horns: boss || r() < 0.55, hornLen: 0.35 + r() * 0.35, spikes: r() < 0.4, sat: 55 + r() * 30,
     born: 0, hit: 0, dead: false, deathT: 0, timer: boss ? bossTime() : 0,
   };
-  if (boss) { SFX.boss(); vibrate(40); moment.boss = { t: 0, ancient }; }
+  // no avanço rápido o chefe cai em menos de 1 s: sem faixa, som e vibração de chefe (exceto o Ancestral)
+  if (boss && (ancient || !fastAdvance())) { SFX.boss(); vibrate(40); moment.boss = { t: 0, ancient }; }
   updateFoeUI(true);
 }
 
@@ -1338,10 +1421,15 @@ function killFoe() {
     S.farmKills++;
     if (S.settings.autoBoss && S.farmKills >= WAVES) { S.bossFailed = false; S.farmKills = 0; S.wave = WAVES - 1; }
   } else {
-    S.wave = Math.min(WAVES - 1, S.wave + 1);
+    let step = 1;
+    if (!f.chest && fastAdvance()) {                    // pula monstros e paga o ouro deles
+      step = Math.min(FAST_STEP, WAVES - 1 - S.wave);
+      if (step > 1) gainGold(goldFor(S.stage) * goldMult() * (step - 1));
+    }
+    S.wave = Math.min(WAVES - 1, S.wave + step);
   }
   if (f.chest) saveSoon();
-  spawnDelay = 0.4;
+  spawnDelay = 0.25;
   uiDirty = true;
 }
 
@@ -1355,6 +1443,7 @@ function bossEscaped() {
 
 function damage(amount, x, y, kind) {
   if (!foe || foe.dead || spawnDelay > 0) return;
+  if (foe.boss) amount *= 1 + 0.2 * tal('execucao');
   foe.hp -= amount;
   foe.hit = 0.12;
   if (kind && S.settings.dmgNums) fx.number(amount, x, y, kind);
@@ -1366,7 +1455,7 @@ function damage(amount, x, y, kind) {
    ========================================================= */
 let wisp = null;
 let nextWisp = 25 + Math.random() * 20;
-function wispInterval() { return (45 + Math.random() * 45) / (1 + 0.1 * art('lanter')); }
+function wispInterval() { return (45 + Math.random() * 45) / (1 + 0.1 * art('lanter')) / (1 + 0.08 * tal('espiritos')); }
 function spawnWisp() {
   const fromLeft = Math.random() < 0.5;
   wisp = { x: fromLeft ? -20 : W + 20, dir: fromLeft ? 1 : -1, baseY: H * (0.22 + Math.random() * 0.25), t: 0, speed: 55 + Math.random() * 25 };
@@ -1379,7 +1468,7 @@ function catchWisp() {
   questAdd('wisps', 1);
   SFX.wisp(); vibrate(25);
   for (let i = 0; i < 26; i++) fx.spark(p.x, p.y, i % 2 ? '#fff3a8' : '#9fe6ff', 1.3);
-  const bonus = 1 + 0.5 * art('lanter');
+  const bonus = (1 + 0.5 * art('lanter')) * (1 + 0.2 * tal('espiritos'));
   const learned = [1, 2, 3].filter(i => S.skills[i].lvl > 0);
   const roll = Math.random();
   if (roll < 0.25 && S.mana < manaMax() * 0.8) {
@@ -1387,7 +1476,7 @@ function catchWisp() {
     toast('O espírito encheu sua mana!', 'gold');
   } else if (roll < 0.5 && learned.length) {
     const i = learned[Math.floor(Math.random() * learned.length)];
-    S.skills[i].until = Math.max(S.skills[i].until, S.clock) + SKILLS[i].dur(S.skills[i].lvl);
+    S.skills[i].until = Math.max(S.skills[i].until, S.clock) + skillDur(i, S.skills[i].lvl);
     toast(`O espírito ativou ${SKILLS[i].name} de graça!`, 'gold');
   } else {
     const g = goldFor(S.stage) * goldMult() * (20 + S.stage * 0.5) * bonus;
@@ -1402,7 +1491,11 @@ function catchWisp() {
    ========================================================= */
 const combo = { n: 0, t: 9 };
 function doTap(x, y, auto) {
-  if (!foe || foe.dead || spawnDelay > 0) return;
+  if (!foe || foe.dead || spawnDelay > 0) {
+    // entre um monstro e outro o toque não causa dano, mas mostra o golpe e mantém o combo
+    if (!auto) { combo.t = 0; hero.atk = 0.14; fx.slash(x, y, false); SFX.hit(); }
+    return;
+  }
   if (!auto) {
     combo.n = combo.t < 0.6 ? combo.n + 1 : 1;
     combo.t = 0;
@@ -1438,7 +1531,7 @@ function buyHero() {
   return true;
 }
 function buyAlly(i) {
-  const n = qtyFor(ALLIES[i].cost, ALLY_G, S.allies[i]);
+  const n = qtyFor(allyBaseCost(i), ALLY_G, S.allies[i]);
   const c = allyCost(i, n);
   if (n < 1 || S.gold < c) return false;
   const was = S.allies[i];
@@ -1468,14 +1561,14 @@ function useSkill(i) {
     return;
   }
   S.mana -= sk.mana;
-  st.cd = S.clock + sk.cd;
-  st.until = S.clock + sk.dur(st.lvl);
+  st.cd = S.clock + skillCd(i);
+  st.until = S.clock + skillDur(i, st.lvl);
   S.stats.skills++;
   questAdd('skills', 1);
   if (i === 0) {
     SFX.zap(); fx.lightning(); fx.shake(12); vibrate(30);
     const c = scene.monster();
-    damage(tapDmg() * skillPower(0, st.lvl), c.x, c.y - c.r * 0.6, 'skill');
+    damage(tapDmg() * skillPower(0, st.lvl) * (1 + 0.3 * tal('eco')), c.x, c.y - c.r * 0.6, 'skill');
   } else {
     SFX.skill();
     toast(`${sk.name} ativada!`);
@@ -1491,6 +1584,34 @@ function buyArtifact(a) {
   SFX.buy(); save(); uiDirty = true;
   return true;
 }
+function learnTalent(id) {
+  const T = TALENTS.find(t => t.id === id);
+  if (!T || !talentCanLearn(T)) return false;
+  const before = TALENT_BRANCHES.find(b => b.id === T.br);
+  const tiersOpen = TIER_REQ.filter(r => talentSpentIn(T.br) >= r).length;
+  S.talents[id] = tal(id) + 1;
+  if (TIER_REQ.filter(r => talentSpentIn(T.br) >= r).length > tiersOpen) { toast(`Novo nível de talentos aberto em ${before.name}!`, 'gold'); structDirty = true; }
+  SFX.buy(); saveSoon(); uiDirty = true;
+  return true;
+}
+function respecCost() { return S.stats.respecs ? 2 : 0; }
+function openRespec() {
+  const spent = talentSpentIn(), c = respecCost();
+  if (!spent) { toast('Você ainda não gastou pontos de talento.'); return; }
+  openModal(`<h2>Redistribuir talentos?</h2>
+    <p>Todos os <b>${spent}</b> pontos gastos voltam para você usar de novo, em qualquer ramo.</p>
+    <p>Custo: <b>${c ? c + ' essências' : 'grátis (primeira vez)'}</b>.</p>
+    <div class="btns"><button class="btn purple" id="okRespec" ${S.ess < c ? 'disabled' : ''}>Redistribuir</button><button class="btn" data-close>Cancelar</button></div>`,
+    sh => sh.querySelector('#okRespec').addEventListener('click', () => {
+      const cost = respecCost();
+      if (S.ess < cost) return;
+      S.ess -= cost; S.stats.respecs++; S.talents = {};
+      S.mana = Math.min(S.mana, manaMax());
+      SFX.wisp(); save(); closeModal(); structDirty = true; uiDirty = true;
+      toast('Pontos de talento devolvidos.', 'gold');
+    }));
+}
+
 function claimAch(a) {
   const tier = S.ach[a.id] || 0;
   if (tier >= a.goals.length || a.get() < a.goals[tier]) return false;
@@ -1505,7 +1626,7 @@ function claimAch(a) {
 function prestige() {
   const g = essGain();
   if (g <= 0) return;
-  const keep = { ess: S.ess + g, essTotal: S.essTotal + g, arts: S.arts, prestiges: S.prestiges + 1, stats: S.stats, ach: S.ach,
+  const keep = { ess: S.ess + g, essTotal: S.essTotal + g, arts: S.arts, talents: S.talents, prestiges: S.prestiges + 1, stats: S.stats, ach: S.ach,
     daily: S.daily, quests: S.quests, ancientBest: S.ancientBest, allyForms: S.allyForms,
     equip: S.equip, inv: S.inv, frags: S.frags, pity: S.pity, nextItemId: S.nextItemId, settings: S.settings, maxStage: S.maxStage, created: S.created, clock: S.clock, wallMax: S.wallMax };
   S = Object.assign(defaults(), keep);
@@ -1533,7 +1654,7 @@ function rarityWeights(ancient) {
   return w;
 }
 function rollRarity(ancient) {
-  if (S.pity >= PITY - 1) return Math.random() < 0.15 ? 5 : 4;
+  if (S.pity >= pityMax() - 1) return Math.random() < 0.15 ? 5 : 4;
   const w = rarityWeights(ancient);
   let r = Math.random() * w.reduce((a, b) => a + b, 0);
   for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) return i; }
@@ -1637,7 +1758,7 @@ function grantItem(it) {
   showLoot(it);
 }
 function bossDrop(ancient, chest) {
-  const chance = ancient ? 1 : chest ? DROP_CHEST : DROP_BOSS;
+  const chance = ancient ? 1 : chest ? DROP_CHEST : DROP_BOSS + 0.03 * tal('cacador');
   if (Math.random() > chance) return;
   const rar = rollRarity(ancient);
   S.pity = rar >= 4 ? 0 : S.pity + 1;
@@ -1795,7 +1916,7 @@ function offlineGains(seconds, showModal) {
   if (d > 0) {
     const hp = hpFor(S.stage);
     kills = Math.floor(seconds / (hp / d + 0.4));
-    gold = kills * goldFor(S.stage) * goldBase();
+    gold = kills * goldFor(S.stage) * goldBase() * (1 + 0.2 * tal('noturna'));
   }
   if (gold > 0) { gainGold(gold); S.stats.kills = addCapped(S.stats.kills, kills); }
   if (showModal && seconds >= 60 && S.settings.offlineModal) {
@@ -2670,6 +2791,11 @@ const ICON = {
 ICON.bag = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.5 13h-11z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
 ICON.frag = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 5v10l-8 5-8-5V7z" fill="#8fd3ff" stroke="#2a6a9a" stroke-width="1.5"/><path d="M12 7l4 2.5v5L12 17l-4-2.5v-5z" fill="#d8f3ff"/></svg>';
 
+const TALENT_ICON = {
+  lamina: ICON.hero, bestiario: ICON.allies, arcano: ICON.skills,
+  fortuna: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.5h5"/></svg>',
+};
+
 const TABS = [
   { id: 'heroi', label: 'Herói', icon: ICON.hero },
   { id: 'aliados', label: 'Aliados', icon: ICON.allies },
@@ -2679,6 +2805,7 @@ const TABS = [
   { id: 'conquistas', label: 'Conquistas', icon: ICON.trophy },
 ];
 let tab = 'heroi';
+let subTab = 'poderes', talentBr = 'lamina';
 let uiDirty = true, structDirty = true;
 let rows = [];
 
@@ -2733,8 +2860,21 @@ function buildList() {
     }
     html += `<p class="muted">Cada aliado é uma criatura mística. Toque na imagem para sortear outra criatura (a primeira troca é grátis). A cada 25 níveis o aliado ganha uma estrela; a cada 5 estrelas o rank muda de cor: Bronze, Prata, Ouro, Esmeralda, Safira, Ametista, Rubi e Celestial. A cena mostra as mais fortes nas plataformas dos muros.</p>`;
   } else if (tab === 'habilidades') {
-    SKILLS.forEach((s, i) => { html += rowHTML('skill' + i, ICON['s' + i], 'var(--ink)'); });
-    html += `<p class="muted">Use os poderes na barra acima do painel (ou teclas 1 a 4). Eles gastam mana, que se recupera sozinha.</p>`;
+    html += `<div class="seg" role="tablist"><button data-sub="poderes" class="${subTab === 'poderes' ? 'on' : ''}">Poderes</button><button data-sub="talentos" class="${subTab === 'talentos' ? 'on' : ''}">Talentos <span id="tpBadge"></span></button></div>`;
+    if (subTab === 'poderes') {
+      SKILLS.forEach((s, i) => { html += rowHTML('skill' + i, ICON['s' + i], 'var(--ink)'); });
+      html += `<p class="muted">Use os poderes na barra acima do painel (ou teclas 1 a 4). Eles gastam mana, que se recupera sozinha.</p>`;
+    } else {
+      const B = TALENT_BRANCHES.find(b => b.id === talentBr);
+      html += `<div class="card" id="tpCard"></div>`;
+      html += `<div class="brs">${TALENT_BRANCHES.map(b => `<button data-br="${b.id}" class="${b.id === talentBr ? 'on' : ''}" style="--bc:${b.color}"><b>${b.name}</b><small id="brpts_${b.id}"></small></button>`).join('')}</div>`;
+      html += `<p class="muted">${B.name}: ${B.desc}.</p>`;
+      for (let t = 0; t < TIER_REQ.length; t++) {
+        html += `<div class="tierHead" id="tier_${t}" style="--bc:${B.color}"></div><div class="tierBody" style="--bc:${B.color}">`;
+        TALENTS.filter(T => T.br === talentBr && T.tier === t).forEach(T => { html += rowHTML('tal_' + T.id, TALENT_ICON[T.br], B.color); });
+        html += `</div>`;
+      }
+    }
   } else if (tab === 'itens') {
     html += `<div class="card equipCard"><canvas id="heroPreview" width="224" height="264" aria-label="Seu herói com os equipamentos"></canvas><div class="eqSum" id="eqSum"></div></div>`;
     html += `<div class="sectionLabel">Equipado</div>`;
@@ -2786,7 +2926,7 @@ function bestAlly() {
   let best = -1, bestV = 0;
   const highest = highestAlly();
   for (let i = 0; i <= Math.min(highest + 1, ALLIES.length - 1); i++) {
-    const l = S.allies[i], n = qtyFor(ALLIES[i].cost, ALLY_G, l);
+    const l = S.allies[i], n = qtyFor(allyBaseCost(i), ALLY_G, l);
     const gain = allyDps(i, l + n) - allyDps(i, l);
     const v = gain / allyCost(i, n);
     if (v > bestV) { bestV = v; best = i; }
@@ -2803,13 +2943,13 @@ function updateList() {
       const n = qtyFor(HERO_C0, HERO_G, S.hero - 1), c = heroCost(n);
       const next = Math.floor(S.hero / 10) * 10 + 10;
       title = `Kael, o Rúnico <em>Nv ${S.hero}</em>`;
-      sub = `Dano de toque: <b>${fmt(tapDmg())}</b><br>Nv ${next}: dano ×1,75`;
+      sub = `Dano de toque: <b>${fmt(tapDmg())}</b><br>Nv ${next}: dano ×1,6`;
       a = `+${n} Nv`; b = ICON.coin + fmt(c); can = S.gold >= c;
     } else if (k.startsWith('ally')) {
       const i = +k.slice(4), A = ALLIES[i], l = S.allies[i];
       locked = i > highestAlly() + 1;
-      const n = qtyFor(A.cost, ALLY_G, l), c = allyCost(i, n);
-      if (locked) { title = '???'; sub = `Contrate ${ALLIES[i - 1].name} para revelar esta criatura`; a = 'Bloqueado'; b = ICON.coin + fmt(A.cost); can = false; }
+      const n = qtyFor(allyBaseCost(i), ALLY_G, l), c = allyCost(i, n);
+      if (locked) { title = '???'; sub = `Contrate ${ALLIES[i - 1].name} para revelar esta criatura`; a = 'Bloqueado'; b = ICON.coin + fmt(allyBaseCost(i)); can = false; }
       else {
         title = `${A.name} <em>${l ? 'Nv ' + l : ''}</em>${i === best ? '<span class="chip">melhor compra</span>' : ''}`;
         const nextMs = l < 10 ? 10 : Math.floor(l / 25) * 25 + 25;
@@ -2823,7 +2963,7 @@ function updateList() {
       const i = +k.slice(5), sk = SKILLS[i], st = S.skills[i];
       locked = S.hero < sk.unlock;
       title = `${sk.name} <em>${st.lvl ? 'Nv ' + st.lvl : ''}</em>`;
-      sub = locked ? `Requer herói no nível <b>${sk.unlock}</b>` : `${sk.desc(st.lvl)}<br>Mana: <b>${sk.mana}</b> · Recarga: <b>${sk.cd} s</b>`;
+      sub = locked ? `Requer herói no nível <b>${sk.unlock}</b>` : `${sk.desc(st.lvl)}<br>Mana: <b>${sk.mana}</b> · Recarga: <b>${fmtD(skillCd(i))} s</b>`;
       if (st.lvl >= SKILL_MAX) { a = 'Máximo'; b = '—'; can = false; }
       else { a = st.lvl ? 'Melhorar' : 'Aprender'; b = ICON.coin + fmt(skillCost(i)); can = !locked && S.gold >= skillCost(i); }
     } else if (k === 'prestige') {
@@ -2857,6 +2997,15 @@ function updateList() {
       a = 'Equipar'; b = SLOT_DEF[it.slot].name; can = true;
       setText(r.s, sub); setText(r.a, a); setText(r.b, b); r.btn.disabled = false;
       continue;
+    } else if (k.startsWith('tal_')) {
+      const T = TALENTS.find(x => 'tal_' + x.id === k), l = tal(T.id), c = TIER_COST[T.tier];
+      locked = !talentUnlocked(T);
+      title = `${T.name} <em>${l}/${T.max}</em>`;
+      sub = l ? `${T.fx(l)}${l < T.max ? `<br>Próximo: ${T.fx(l + 1)}` : ''}` : T.fx(1);
+      if (l >= T.max) { a = 'Máximo'; b = '★'; can = false; }
+      else if (locked) { a = 'Bloqueado'; b = `${c} pt`; can = false; }
+      else { a = l ? 'Melhorar' : 'Aprender'; b = `${c} ${c > 1 ? 'pts' : 'pt'}`; can = talentPointsFree() >= c; }
+      cls = 'tal';
     } else if (k.startsWith('quest_')) {
       const q = S.quests[k.slice(6)], T = QUEST_TYPES.find(x => x.type === q.type);
       title = T ? T.text(q.goal) : 'Missão';
@@ -2883,7 +3032,7 @@ function updateList() {
     r.el.classList.toggle('locked', locked);
   }
   setText($('#heroCard'), `<p>Chance de crítico: <b>${fmtPlain(critChance() * 100)}%</b> · Dano crítico: <b>×${fmtPlain(critMult())}</b><br>
-    Bônus de dano permanente: <b>×${fmtPlain(dmgMult())}</b> · Combo máximo: <b>+40%</b> (100 toques seguidos)<br>
+    Bônus de dano permanente: <b>×${fmtPlain(dmgMult())}</b> · Combo máximo: <b>+${40 + 10 * tal('ritmo')}%</b> (100 toques seguidos)<br>
     O toque inclui <b>4%</b> do DPS dos aliados.</p>`);
   const pt = (v, f) => `<b>${fmtPlain(v)}%</b>`;
   setText($('#eqSum'), `<b style="color:var(--gold)">Kael, o Rúnico</b><br>
@@ -2893,11 +3042,24 @@ function updateList() {
     const wn = rarityWeights(false), wa = rarityWeights(true), sn = wn.reduce((x, y) => x + y, 0), sa = wa.reduce((x, y) => x + y, 0);
     const pf = v => v >= 10 ? Math.round(v) : v.toFixed(1).replace('.', ',');
     setText($('#oddsCard'), `<h3 class="gold">Chances de item</h3>
-      <p>Chefe: <b>${DROP_BOSS * 100}%</b> de soltar item · Chefe Ancestral: <b>100%</b> · Baú Vivo: <b>${DROP_CHEST * 100}%</b>.
-      O nível do item acompanha o estágio, e 8% dos itens são <b>Excepcionais</b>, com nível bem acima. Sorte acumulada: <b>${S.pity}/${PITY}</b> itens sem Lendário. Cada item sem Lendário aumenta a chance, e o ${PITY}º é garantido.</p>
+      <p>Chefe: <b>${fmtD((DROP_BOSS + 0.03 * tal('cacador')) * 100)}%</b> de soltar item · Chefe Ancestral: <b>100%</b> · Baú Vivo: <b>${DROP_CHEST * 100}%</b>.
+      O nível do item acompanha o estágio, e 8% dos itens são <b>Excepcionais</b>, com nível bem acima. Sorte acumulada: <b>${S.pity}/${pityMax()}</b> itens sem Lendário. Cada item sem Lendário aumenta a chance, e o ${pityMax()}º é garantido.</p>
       <div class="odds"><span class="h">Raridade</span><span class="h">Chefe</span><span class="h">Ancestral</span>
       ${RARITIES.map((r, i) => `<span style="color:${r.color};font-weight:900">${r.name}</span><span>${pf(wn[i] / sn * 100)}%</span><span>${pf(wa[i] / sa * 100)}%</span>`).join('')}</div>`);
   }
+  if ($('#tpCard')) {
+    const free = talentPointsFree(), total = talentPointsTotal(), next = (Math.floor(S.maxStage / 5) + 1) * 5;
+    setText($('#tpCard'), `<h3 class="gold">${free} ${free === 1 ? 'ponto livre' : 'pontos livres'} <small class="muted">de ${total}</small></h3>
+      <p>Ganhe 1 ponto a cada 5 estágios de recorde (próximo no estágio <b>${next}</b>) e 2 a cada renascimento. Os talentos ficam para sempre, mesmo depois de renascer.</p>
+      <div class="btns"><button class="btn" data-respec>Redistribuir pontos${respecCost() ? ' (2 essências)' : ' (grátis)'}</button></div>`);
+    for (const b of TALENT_BRANCHES) { const n = talentSpentIn(b.id); setText($('#brpts_' + b.id), `${n} ${n === 1 ? 'pt' : 'pts'}`); }
+    const spentBr = talentSpentIn(talentBr);
+    for (let t = 0; t < TIER_REQ.length; t++) {
+      const open = spentBr >= TIER_REQ[t];
+      setText($('#tier_' + t), `<span class="node ${open ? 'open' : ''}">${t + 1}</span> Nível ${t + 1} · ${TIER_COST[t]} ${TIER_COST[t] > 1 ? 'pontos' : 'ponto'} por melhoria${t ? ` · ${open ? 'aberto' : `abre com ${TIER_REQ[t]} pontos neste ramo (faltam ${TIER_REQ[t] - spentBr})`}` : ''}`);
+    }
+  }
+  setText($('#tpBadge'), talentPointsFree() ? `<span class="chip">${talentPointsFree()}</span>` : '');
   setText($('#essCard'), `<h3>${S.ess} essências</h3><p>Você já ganhou <b>${S.essTotal}</b> essências no total. Cada uma dá <b>+10%</b> de dano para sempre, mesmo depois de gasta. Renascimentos: <b>${S.prestiges}</b>.</p>`);
   setText($('#dailyCard'), dailyCardHTML(true));
   const dl = $('#statsDl');
@@ -2917,7 +3079,7 @@ function tabBadges() {
   const can = {
     heroi: S.gold >= heroCost(1),
     aliados: ALLIES.some((A, i) => i <= highestAlly() + 1 && S.gold >= allyCost(i, 1)),
-    habilidades: SKILLS.some((sk, i) => S.hero >= sk.unlock && S.skills[i].lvl < SKILL_MAX && S.gold >= skillCost(i)),
+    habilidades: SKILLS.some((sk, i) => S.hero >= sk.unlock && S.skills[i].lvl < SKILL_MAX && S.gold >= skillCost(i)) || TALENTS.some(talentCanLearn),
     itens: S.inv.some(it => itemCompare(it).ratio > 1.0001),
     reliquias: essGain() > 0 || ARTIFACTS.some(a => !(a.max && art(a.id) >= a.max) && S.ess >= artCost(a)),
     conquistas: dailyState().available || QKEYS.some(k => !S.quests[k].done && S.quests[k].prog >= S.quests[k].goal) || (!S.quests.bonus && QKEYS.every(k => S.quests[k].done)) || ACH.some(a => { const t = S.ach[a.id] || 0; return t < a.goals.length && a.get() >= a.goals[t]; }),
@@ -2941,7 +3103,7 @@ function updateHUD() {
   const gps = goldPerSec();
   setText($('#gpsTxt'), gps > 0 ? `+${fmt(gps)}/s` : '');
   setText($('#zoneTxt'), zoneOf(S.stage).name);
-  setText($('#dpsTag'), `DPS <b>${fmt(dps())}</b> · Toque <b>${fmt(tapDmg())}</b>${shownCache.total ? ` · ${shownCache.total} aliados` : ''}`);
+  setText($('#dpsTag'), `DPS <b>${fmt(dps())}</b> · Toque <b>${fmt(tapDmg())}</b>${shownCache.total ? ` · ${shownCache.total} aliados` : ''}${fastAdvance() && !S.bossFailed ? ' · <b style="color:var(--ok)">⏩ Avanço rápido</b>' : ''}`);
   let pips = '';
   for (let i = 0; i < WAVES - 1; i++) pips += `<i class="${i < S.wave ? 'on' : ''}"></i>`;
   pips += `<i class="boss ${foe && foe.boss ? 'on' : ''}"></i>`;
@@ -2957,7 +3119,7 @@ function updateHUD() {
     b.classList.toggle('locked', locked);
     b.classList.toggle('active', skillActive(i));
     b.classList.toggle('nomana', !locked && S.mana < sk.mana);
-    b.querySelector('.cd').style.setProperty('--p', locked ? 0 : (cdLeft / sk.cd).toFixed(3));
+    b.querySelector('.cd').style.setProperty('--p', locked ? 0 : Math.min(1, cdLeft / skillCd(i)).toFixed(3));
     const txt = skillActive(i) ? Math.ceil(st.until - S.clock) + 's' : cdLeft > 0 ? String(Math.ceil(cdLeft)) : '';
     setText(b.querySelector('.cdTxt'), txt);
   });
@@ -3338,6 +3500,7 @@ function doBuy(k) {
   if (k.startsWith('art_')) return buyArtifact(ARTIFACTS.find(a => 'art_' + a.id === k));
   if (k.startsWith('ach_')) return claimAch(ACH.find(a => 'ach_' + a.id === k));
   if (k.startsWith('quest_')) return claimQuest(k.slice(6));
+  if (k.startsWith('tal_')) return learnTalent(k.slice(4));
   if (k.startsWith('eq_')) return upgradeEquip(k.slice(3));
   if (k.startsWith('it_')) return equipItem(+k.slice(3));
   if (k === 'questBonus') return claimQuestBonus();
@@ -3400,6 +3563,9 @@ function bindEvents() {
   $('#list').addEventListener('scroll', stopHold, { passive: true });
   $('#list').addEventListener('click', e => {
     if (e.target.closest('[data-daily]')) { claimDaily(); updateList(); return; }
+    const sb = e.target.closest('[data-sub]'); if (sb) { subTab = sb.dataset.sub; structDirty = true; return; }
+    const bb = e.target.closest('[data-br]'); if (bb) { talentBr = bb.dataset.br; structDirty = true; return; }
+    if (e.target.closest('[data-respec]')) { openRespec(); return; }
     const rr = e.target.closest('[data-reroll]'); if (rr) { openReroll(+rr.dataset.reroll); return; }
     const sv = e.target.closest('[data-salvage]'); if (sv) { salvageItem(+sv.dataset.salvage); return; }
     if (e.target.closest('[data-salvagecommon]')) { salvageCommons(); return; }
@@ -3452,7 +3618,7 @@ function bindEvents() {
    LOOP PRINCIPAL
    ========================================================= */
 let lastTick = performance.now();
-let uiTimer = 0, furyAcc = 0, paused = false;
+let uiTimer = 0, furyAcc = 0, ghostAcc = 0, paused = false;
 let wallLast = Date.now();
 
 function step(dt) {
@@ -3486,15 +3652,20 @@ function step(dt) {
   foe.born += dt;
   if (foe.hit > 0) foe.hit -= dt;
 
-  const d = dps();
+  const d = foe.born >= ENTRY_TIME ? dps() * (foe.boss ? 1 + 0.3 * tal('selvagem') : 1) : 0;
   if (d > 0) damage(d * dt, 0, 0, null);
   if (foe.dead) return;
 
   if (skillActive(1)) {
-    furyAcc += dt * 10;
+    furyAcc += dt * (10 + 2 * tal('tempestade'));
     const m = scene.monster();
     while (furyAcc >= 1 && !foe.dead) { furyAcc -= 1; doTap(m.x + (Math.random() - 0.5) * m.r, m.y + (Math.random() - 0.4) * m.r, true); }
   } else furyAcc = 0;
+  if (tal('fantasma') && !foe.dead) {                  // Lâmina Fantasma: ataques automáticos
+    ghostAcc += dt * tal('fantasma');
+    const m = scene.monster();
+    while (ghostAcc >= 1 && !foe.dead) { ghostAcc -= 1; doTap(m.x + (Math.random() - 0.5) * m.r, m.y + (Math.random() - 0.4) * m.r, true); }
+  }
 
   if (foe.boss && !foe.dead) {
     foe.timer -= dt;
