@@ -55,10 +55,40 @@ As estrelas aparecem na lista e na plataforma de cada criatura. A partir de Ouro
 
 ## Salvamento
 
-- **Automático** a cada 5, 10, 30 ou 60 s (configurável), ao comprar algo, ao vencer um chefe e ao sair ou trocar de aba.
-- Cada salvamento tem verificação de integridade e mantém uma **cópia de backup**. Se o principal estiver corrompido, o backup é carregado.
-- **Progresso offline**: ao voltar, seus aliados terão coletado ouro pelo tempo que você ficou fora (até 12 h).
-- **Exportar e importar**: em Configurações, gere um código de backup para guardar ou levar para outro aparelho.
+- **Automático** a cada 5, 10, 30 ou 60 s (configurável), ao comprar algo, ao vencer um chefe, ao renascer, ao sair ou trocar de aba.
+- Cada gravação é **validada antes** (nenhum número inválido é gravado) e **conferida depois** (o jogo lê de volta o que gravou). Se falhar, aparece o aviso **⚠ Não salvo** no topo da batalha, com opção de tentar de novo e de baixar o código de backup. O jogo nunca mostra “salvo” sem ter salvado.
+- **Cópias**: o principal anterior vira backup, e até 3 cópias rotativas são guardadas (no máximo uma a cada 10 min, e também ao renascer e ao importar).
+- **Recuperação**: se o principal estiver danificado e o backup estiver bom, o backup é carregado e o jogo avisa. Se nenhuma cópia recente servir, abre a tela **Recuperar progresso** com as cópias disponíveis, a opção de exportar os dados brutos e, só com confirmação, a de começar de novo. O salvamento danificado **nunca é apagado** automaticamente.
+- **Duas abas**: cada gravação leva um número de revisão. Se outra aba salvar um progresso mais novo, a aba antiga pausa e para de salvar, em vez de sobrescrever.
+- **Progresso offline**: até 12 h, contado a partir do maior horário já registrado. Voltar o relógio do aparelho não repete ganhos (e não reabre recompensa diária nem missões).
+- **Exportar e importar**: em Configurações, gere um código `LR1.…` (ou baixe um arquivo). Ao importar, o jogo mostra um resumo dos dois progressos, guarda uma cópia do atual e só então troca. A cópia aparece em **Cópias de segurança guardadas** e pode ser restaurada. Códigos antigos continuam válidos.
+- **Apagar progresso** pede confirmação dupla e guarda uma cópia restaurável.
+
+### Link compartilhado × progresso
+
+O progresso fica no armazenamento do navegador (`localStorage`), separado por navegador, perfil e endereço do site.
+
+- Abrir o link do jogo pela primeira vez cria um jogo novo. Compartilhar o link **não** envia o seu progresso.
+- Quem já joga naquele navegador continua com o próprio save.
+- Outro domínio ou subdomínio (outra hospedagem, versão de teste) tem armazenamento separado: o progresso **não** passa sozinho de um para o outro. Use o código de backup.
+- Nada é importado automaticamente pela URL.
+- Quando o jogo roda no claude.ai com login, o progresso também é salvo na sua conta. Se a conta tiver um progresso diferente do deste aparelho, o jogo pergunta qual usar e guarda o outro como cópia.
+
+### Limitações honestas
+
+- A verificação de integridade (FNV-1a) detecta **corrupção acidental**. Ela não impede quem controla o navegador de editar o próprio save, e o jogo não tenta fingir o contrário.
+- A data e a hora vêm do aparelho. As proteções contra relógio alterado reduzem abusos simples, mas não existe relógio confiável sem servidor.
+- O modo privado de alguns navegadores bloqueia ou apaga o armazenamento ao fechar. Nesse caso o jogo avisa e o código de backup é o único jeito de guardar o progresso.
+
+## Testes
+
+```
+node --test tests/core.test.mjs
+```
+
+São 23 testes, sem dependências (Node 18 ou mais novo), com saves fictícios em um armazenamento falso em memória. Cobrem migração de saves reais da versão anterior (gerados pelo próprio código original, guardado em `_backup_original_2026-10-31/`), compatibilidade nos dois sentidos, corrupção e recuperação, duas abas, quota cheia, armazenamento bloqueado, importação válida e hostil, progresso offline, relógio voltado e números extremos.
+
+Os ganchos de teste no navegador só existem abrindo o jogo com `#teste` no fim do endereço.
 
 ## Tempo de jogo
 
@@ -66,5 +96,5 @@ As estatísticas separam **tempo jogando (ativo)**, que só conta se você tocou
 
 ## Configurações
 
-Efeitos sonoros e volume, vibração, números de dano, partículas, tremor de tela, notação dos números (K/M/B ou científica),
+Sons (com botão de silenciar no topo), volume dos efeitos e da música, vibração, texto maior, reduzir movimento, números de dano, partículas, tremor de tela, notação dos números (K/M/B ou científica),
 intervalo do salvamento automático, desafio automático do chefe, resumo ao voltar, backup e apagar progresso.
