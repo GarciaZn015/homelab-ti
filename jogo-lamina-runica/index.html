@@ -107,6 +107,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 @keyframes pulse { 50% { transform: scale(1.06); } }
 #saveDot { position: absolute; top: 10px; right: max(10px, env(safe-area-inset-right, 0px)); font-size: 10px; font-weight: 800; color: var(--ok); opacity: 0; transition: opacity .4s; pointer-events: none; }
 #saveDot.show { opacity: .9; }
+#saveWarn { position: absolute; top: 6px; right: max(10px, env(safe-area-inset-right, 0px)); z-index: 25; border: 1px solid var(--danger); background: rgba(40,8,12,.92); color: #ffc0b8; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 900; }
+#btnMute .cross { display: none; }
+#btnMute.off .cross { display: inline; }
+#btnMute.off .waves { display: none; }
+#btnMute.off { color: var(--danger); }
+.sumCard .stats { font-size: 12px; gap: 3px 10px; }
+html.bigText #panel, html.bigText #skillbar, html.bigText #top, html.bigText .sheet { zoom: 1.14; }
+html.lowMotion #btnBoss, html.lowMotion .bar.timer.urgent { animation: none; }
 
 /* ---------- poderes ---------- */
 #skillbar { background: var(--panel); border-top: 1px solid var(--line); padding-block: 6px; display: flex; flex-direction: column; gap: 5px; }
@@ -114,9 +122,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .mana > i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #2a7fd6, var(--mana)); }
 .mana > span { position: absolute; inset: 0; font-size: 9px; font-weight: 900; text-align: center; line-height: 10px; text-shadow: 0 1px 1px #000; }
 .skills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.skill { position: relative; height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 0; }
+.skill { position: relative; height: 54px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 0; }
 .skill svg { width: 22px; height: 22px; position: relative; z-index: 1; }
-.skill small { position: relative; z-index: 1; font-size: 10px; font-weight: 900; color: var(--mana); }
+.skill small { position: relative; z-index: 1; font-size: 9.5px; font-weight: 900; color: var(--mana); }
+.skill .nm { position: relative; z-index: 1; font-size: 10.5px; font-weight: 900; line-height: 1; display: flex; gap: 3px; align-items: center; }
+.skill kbd { font: 800 8.5px var(--f-body); color: var(--muted); border: 1px solid var(--line); border-radius: 3px; padding: 0 2px; }
+@media (hover: none) { .skill kbd { display: none; } }
+.skill svg { width: 20px; height: 20px; }
 .skill .cd { position: absolute; inset: 0; background: conic-gradient(rgba(5,4,15,.78) calc(var(--p, 0) * 1turn), transparent 0); }
 .skill .cdTxt { position: absolute; z-index: 2; font-family: var(--f-display); font-size: 15px; text-shadow: 0 1px 3px #000; }
 .skill.active { border-color: var(--gold); box-shadow: inset 0 0 14px rgba(255,201,74,.45); }
@@ -124,7 +136,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .skill.nomana small { color: var(--danger); }
 
 /* ---------- painel ---------- */
-#panel { flex: 0 0 50%; min-height: 0; display: flex; flex-direction: column; background: var(--panel); border-top: 1px solid var(--line); }
+#panel { flex: 0 0 44%; min-height: 0; display: flex; flex-direction: column; background: var(--panel); border-top: 1px solid var(--line); }
 #panel.collapsed { flex: 0 0 auto; }
 #panel.collapsed #qty, #panel.collapsed #list { display: none; }
 #tabs { display: grid; grid-template-columns: repeat(6, 1fr) 34px; border-bottom: 1px solid var(--line); }
@@ -177,7 +189,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .sectionLabel { font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
 
 /* ---------- avisos e janelas ---------- */
-#toasts { position: absolute; left: 0; right: 0; top: 132px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 30; }
+#toasts { position: absolute; left: 0; right: 0; top: 74px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 30; }
 .toast { background: rgba(20,18,37,.94); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; font-weight: 800; font-size: 13px; max-width: 90%; text-align: center; animation: toastIn .25s ease-out; }
 .toast.gold { border-color: var(--gold); color: var(--gold); }
 .toast.bad { border-color: var(--danger); color: #ffc0b8; }
@@ -209,6 +221,23 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
 .muted { color: var(--muted); font-size: 12px; }
 .cloudOn { color: var(--ok); font-weight: 900; }
 
+/* Telas largas e celular deitado: batalha à esquerda, painel à direita (a cena deixa de ser espremida) */
+@media (min-width: 760px) and (min-aspect-ratio: 5/4), (orientation: landscape) and (max-height: 540px) {
+  #app { max-width: 1400px; display: grid; grid-template-columns: minmax(0, 1fr) clamp(300px, 36vw, 440px); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "top panel" "scene panel" "skill panel"; }
+  #top { grid-area: top; } #scene { grid-area: scene; min-height: 0; } #skillbar { grid-area: skill; }
+  #panel { grid-area: panel; border-top: 0; border-left: 1px solid var(--line); min-height: 0; }
+  #app:has(#panel.collapsed) { grid-template-columns: minmax(0, 1fr) 0; }
+  #app:has(#panel.collapsed) #panel { border: 0; overflow: visible; }
+  #app:has(#panel.collapsed) #tabs { position: absolute; right: 0; top: 50%; width: 44px; grid-template-columns: 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 12px 0 0 12px; z-index: 5; transform: translateY(-50%); }
+  #app:has(#panel.collapsed) #tabs [data-tab] { display: none; }
+  #panel.collapsed #panelToggle svg { transform: rotate(90deg); }
+  #panelToggle svg { transform: rotate(-90deg); }
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  #top { padding-block: 3px; }
+  .skill { height: 44px; } .skill small { display: none; }
+  #skillbar { padding-block: 4px; gap: 3px; }
+}
 @media (prefers-reduced-motion: reduce) {
   #btnBoss, #loot, .bar.timer.urgent { animation: none; }
   .toast { animation: none; }
@@ -231,6 +260,7 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 7-7 13L5 9z" fill="#c58bff"/><path d="M5 9h14M12 2l-3 7 3 13 3-13z" fill="none" stroke="#7a46a8" stroke-width="1.4" stroke-linejoin="round"/></svg>
       <b id="essTxt">0</b>
     </div>
+    <button class="iconBtn" id="btnMute" aria-label="Silenciar" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor" stroke="none"/><path class="waves" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/><path class="cross" d="M16 9l5 6M21 9l-5 6"/></svg></button>
     <button class="iconBtn" id="btnSettings" aria-label="Configurações">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
@@ -245,8 +275,10 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
     </div>
     <div id="dpsTag">DPS <b id="dpsTxt">0</b> · Toque <b id="tapTxt">1</b></div>
     <button id="btnBoss" hidden>Desafiar chefe</button>
-    <div id="saveDot">✓ salvo</div>
+    <div id="saveDot" aria-hidden="true">✓ salvo</div>
+    <button id="saveWarn" hidden>⚠ Não salvo</button>
     <div id="loot" hidden></div>
+    <div id="toasts" role="status" aria-live="polite"></div>
   </main>
 
   <section id="skillbar" class="gutter">
@@ -260,7 +292,6 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
     <div id="list" class="gutter"></div>
   </section>
 
-  <div id="toasts"></div>
   <div id="modal" hidden><div class="sheet gutter" id="sheet" role="dialog" aria-modal="true"></div></div>
 </div>
 
@@ -268,12 +299,23 @@ textarea { width: 100%; min-height: 84px; background: #0e0c20; color: var(--text
 (() => {
 'use strict';
 
+/* @core-begin — dados, estado, validação e salvamento (sem DOM; testado em tests/core.test.mjs) */
 /* =========================================================
    CONSTANTES E DADOS
    ========================================================= */
+// As chaves antigas continuam as mesmas: versões anteriores do jogo seguem lendo o save.
 const SAVE_KEY = 'laminaRunica.save.v1';
-const BACKUP_KEY = 'laminaRunica.backup.v1';
-const VERSION = 4;
+const BACKUP_KEY = 'laminaRunica.backup.v1';      // cópia do principal anterior (válido)
+const SNAP_KEY = 'laminaRunica.snap.';            // + 0..SNAP_COUNT-1: cópias rotativas mais antigas
+const SAFETY_KEY = 'laminaRunica.safety.';        // + import | reset | cloud | repair | recover
+const CORRUPT_KEY = 'laminaRunica.corrupt';       // cópia intacta de um principal ilegível
+const SNAP_COUNT = 3;
+const SNAP_EVERY = 10 * 60 * 1000;                // no máximo uma cópia rotativa a cada 10 min
+const SAVE_FMT = 2;                               // formato do envelope (1 = só {h, data})
+const MAX_SAVE_CHARS = 1500000;
+const MAX_CODE_CHARS = 2500000;
+const MAX_NUM = 1e305;                            // teto para nunca virar Infinity (JSON grava Infinity como null)
+const VERSION = 5;
 const INV_MAX = 40;
 const PITY = 40;            // chefes com item sem Lendário até um Lendário garantido
 const DROP_BOSS = 0.25;     // chance de item por chefe comum (Ancestral: 100%)
@@ -414,7 +456,7 @@ const BOSS_T = ['o Devorador', 'o Inquebrável', 'a Fera Antiga', 'o Senhor da Z
    ========================================================= */
 function defaults() {
   return {
-    v: VERSION, created: Date.now(), lastSave: Date.now(), clock: 0,
+    v: VERSION, created: Date.now(), lastSave: Date.now(), wallMax: Date.now(), clock: 0,
     gold: 0, stage: 1, wave: 0, maxStage: 1, runMaxStage: 1, bossFailed: false, farmKills: 0,
     hero: 1, allies: ALLIES.map(() => 0), allyForms: randomForms(),
     skills: SKILLS.map(() => ({ lvl: 0, until: 0, cd: 0 })), mana: 50,
@@ -427,6 +469,7 @@ function defaults() {
     settings: {
       sound: true, volume: 0.6, vibrate: true, dmgNums: true, particles: true, shake: true,
       notation: 'letters', autosave: 10, autoBoss: true, buyQty: 1, offlineModal: true, panelCollapsed: false, music: true, autoSalvage: 0,
+      musicVol: 0.6, reduceMotion: false, bigText: false,
     },
   };
 }
@@ -452,108 +495,386 @@ function merge(def, src) {
   return src;
 }
 
+/* ---------- migrações ----------
+   Cada entrada leva o save da versão (n-1) para n. Campos novos vêm de defaults() via merge();
+   aqui só entram transformações reais. Nenhuma migração altera ouro, níveis, itens ou quantidades. */
+const MIGRATIONS = {
+  2: raw => { if (raw.stats && typeof raw.stats === 'object') delete raw.stats.time; },  // v1 somava o tempo offline ao tempo de jogo
+  3: () => {},                                                                            // v3 e v4 só acrescentaram campos
+  4: () => {},
+  5: raw => { if (!(+raw.wallMax > 0)) raw.wallMax = +raw.lastSave || 0; },               // v5: maior horário já registrado
+};
 function migrate(raw) {
-  if (!raw.v || raw.v < 2) {
-    // v1 somava o tempo offline ao tempo de jogo; o contador antigo é descartado.
-    if (raw.stats) delete raw.stats.time;
-  }
+  const from = Math.max(1, Math.floor(+raw.v) || 1);
+  for (let t = from + 1; t <= VERSION; t++) if (MIGRATIONS[t]) MIGRATIONS[t](raw);
   raw.v = VERSION;
   return raw;
 }
 
+const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
+function itemName(it) { return `${SLOT_DEF[it.slot].models[it.model]} ${ITEM_SUFFIX[it.rar]}`; }
+function fragValue(it) { return RARITIES[it.rar].frag * (1 + Math.floor(it.lvl / 25)) + it.up * 2; }
 function sanitizeItem(it) {
-  if (!it || typeof it !== 'object' || !SLOT_DEF[it.slot]) return null;
+  if (!it || typeof it !== 'object' || !Object.prototype.hasOwnProperty.call(SLOT_DEF, it.slot)) return null;
   const out = {
-    id: Math.floor(+it.id) || 0, slot: it.slot, rar: clamp(Math.floor(+it.rar || 0), 0, 5),
-    lvl: Math.max(1, Math.floor(+it.lvl || 1)), up: Math.max(0, Math.floor(+it.up || 0)),
+    id: Math.floor(+it.id) || 0, slot: it.slot, rar: clampN(Math.floor(+it.rar || 0), 0, RARITIES.length - 1),
+    lvl: clampN(Math.floor(+it.lvl || 1), 1, 1e6), up: clampN(Math.floor(+it.up || 0), 0, 1e4),
     model: Math.abs(Math.floor(+it.model || 0)) % SLOT_DEF[it.slot].models.length, hue: Math.abs(Math.floor(+it.hue || 0)) % 360,
     ex: !!it.ex, sec: null, name: '',
   };
-  if (it.sec && SECONDARY.some(x => x.type === it.sec.type) && isFinite(+it.sec.val)) out.sec = { type: it.sec.type, val: +it.sec.val };
-  out.name = typeof it.name === 'string' && it.name ? it.name.slice(0, 60) : itemName(out);
+  if (it.sec && SECONDARY.some(x => x.type === it.sec.type) && isFinite(+it.sec.val)) out.sec = { type: it.sec.type, val: clampN(+it.sec.val, 0, 1e4) };
+  out.name = itemName(out);        // o nome é sempre recalculado: texto do save nunca chega ao HTML
   return out;
 }
-function fromRaw(raw) {
+
+// Corrige apenas valores impossíveis (negativos, fora do intervalo, ids desconhecidos). Saves legítimos passam intactos.
+function sanitizeState(m, raw, fixes) {
+  const num = (o, k, lo, hi, int, label) => {
+    const v0 = o[k];
+    let v = typeof v0 === 'number' && isFinite(v0) ? v0 : lo;
+    if (int) v = Math.floor(v);
+    v = clampN(v, lo, hi);
+    if (v !== v0) { o[k] = v; fixes.push(label || k); }
+  };
+  num(m, 'gold', 0, MAX_NUM, false);
+  num(m, 'stage', 1, 1e6, true); num(m, 'wave', 0, WAVES - 1, true);
+  num(m, 'runMaxStage', m.stage, 1e6, true); num(m, 'maxStage', m.runMaxStage, 1e6, true);
+  num(m, 'farmKills', 0, 1e9, true); num(m, 'hero', 1, 1e7, true);
+  m.allies.forEach((_, i) => num(m.allies, i, 0, 1e7, true, 'allies'));
+  m.allyForms.forEach(f => { num(f, 'sp', 0, SPECIES.length - 1, true, 'allyForms'); num(f, 'hue', 0, 359, true, 'allyForms'); });
+  for (const k of Object.keys(m.arts)) {
+    const A = ARTIFACTS.find(a => a.id === k);
+    if (!A) { delete m.arts[k]; fixes.push('arts'); continue; }
+    num(m.arts, k, 0, A.max || 1e5, true, 'arts');
+  }
+  num(m, 'ess', 0, 1e12, true); num(m, 'essTotal', 0, 1e12, true);
+  num(m, 'prestiges', 0, 1e9, true); num(m, 'ancientBest', 0, 1e6, true);
+  for (const k of Object.keys(m.ach)) {
+    const A = ACH.find(a => a.id === k);
+    if (!A) { delete m.ach[k]; fixes.push('ach'); continue; }
+    num(m.ach, k, 0, A.goals.length, true, 'ach');
+  }
+  m.skills.forEach(st => { num(st, 'lvl', 0, SKILL_MAX, true, 'skills'); num(st, 'until', -1e12, 1e12, false, 'skills'); num(st, 'cd', -1e12, 1e12, false, 'skills'); });
+  num(m, 'mana', 0, 100 + 15 * (m.arts.calice || 0), false);
+  num(m, 'frags', 0, 1e15, true); num(m, 'pity', 0, PITY - 1, true);
+  num(m, 'clock', 0, 1e12, false);
+  for (const k of ['created', 'lastSave', 'wallMax']) num(m, k, 0, 1e14, false);
+  for (const k of Object.keys(m.stats)) num(m.stats, k, 0, MAX_NUM, false, 'stats');
+  const DAY = /^\d{4}-\d{2}-\d{2}$/;
+  if (m.daily.last && !DAY.test(m.daily.last)) { m.daily.last = ''; fixes.push('daily'); }
+  num(m.daily, 'streak', 0, 7, true, 'daily');
+  if (m.quests.day && !DAY.test(m.quests.day)) { m.quests.day = ''; fixes.push('quests'); }
+  for (const k of QKEYS) {
+    const q = m.quests[k];
+    if (q.type && !QUEST_TYPES.some(t => t.type === q.type)) { q.type = ''; m.quests.day = ''; fixes.push('quests'); }
+    num(q, 'goal', 0, 1e9, true, 'quests'); num(q, 'prog', 0, 1e12, false, 'quests');
+  }
+  const st = m.settings, rs = raw && raw.settings && typeof raw.settings === 'object' ? raw.settings : {};
+  num(st, 'volume', 0, 1, false, 'settings'); num(st, 'musicVol', 0, 1, false, 'settings');
+  if (!['letters', 'sci'].includes(st.notation)) { st.notation = 'letters'; fixes.push('settings'); }
+  if (![5, 10, 30, 60].includes(st.autosave)) { st.autosave = 10; fixes.push('settings'); }
+  num(st, 'autoSalvage', 0, 3, true, 'settings');
+  // buyQty pode ser número ou 'max'; merge() descartava 'max' por ser de outro tipo (bug: "MÁX" nunca ficava salvo).
+  st.buyQty = [1, 10, 100, 'max'].includes(rs.buyQty) ? rs.buyQty : 1;
+}
+
+function fromRawChecked(raw) {
+  const fixes = [];
   const m = merge(defaults(), migrate(raw));
-  m.inv = Array.isArray(raw.inv) ? raw.inv.map(sanitizeItem).filter(Boolean).slice(0, INV_MAX) : [];
+  const items = Array.isArray(raw.inv) ? raw.inv : [];
+  m.inv = items.slice(0, INV_MAX + 20).map(sanitizeItem).filter(Boolean);
+  if (m.inv.length !== Math.min(items.length, INV_MAX + 20)) fixes.push('inv');
   for (const k of SLOT_KEYS) {
     const it = raw.equip && raw.equip[k] ? sanitizeItem(raw.equip[k]) : null;
     m.equip[k] = it && it.slot === k ? it : null;
+    if (raw.equip && raw.equip[k] && !m.equip[k]) fixes.push('equip');
   }
-  const ids = m.inv.concat(SLOT_KEYS.map(k => m.equip[k]).filter(Boolean)).map(x => x.id);
-  m.nextItemId = Math.max(m.nextItemId, ...ids, 0) + 1;
-  return m;
+  // excedente do inventário vira fragmentos em vez de sumir
+  while (m.inv.length > INV_MAX) { const it = m.inv.pop(); m.frags += fragValue(it); fixes.push('inv'); }
+  sanitizeState(m, raw, fixes);
+  // ids únicos: equipar/desmanchar procuram pelo id
+  const seen = new Set();
+  let next = Math.max(1, Math.floor(+m.nextItemId) || 1);
+  for (const it of SLOT_KEYS.map(k => m.equip[k]).filter(Boolean).concat(m.inv)) {
+    if (it.id <= 0 || seen.has(it.id)) { it.id = 0; } else seen.add(it.id);
+    next = Math.max(next, it.id + 1);
+  }
+  for (const it of SLOT_KEYS.map(k => m.equip[k]).filter(Boolean).concat(m.inv)) if (!it.id) { it.id = next++; fixes.push('itemIds'); }
+  m.nextItemId = next;
+  return { state: m, fixes: [...new Set(fixes)] };
 }
+function fromRaw(raw) { return fromRawChecked(raw).state; }
 
+// FNV-1a de 32 bits: detecta corrupção acidental. NÃO é proteção contra quem edita o próprio save.
 function hash(str) {
   let h = 2166136261;
   for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
   return (h >>> 0).toString(36);
 }
 
-function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-function storeSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
-function storeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+// Antes de gravar: todo número precisa ser finito; estrutura dentro dos limites.
+function validateState(s) {
+  const bad = [];
+  let nodes = 0;
+  const walk = (v, path, depth) => {
+    if (++nodes > 20000 || depth > 8) { bad.push('estrutura grande demais'); return; }
+    if (typeof v === 'number') { if (!isFinite(v)) bad.push(path); return; }
+    if (v && typeof v === 'object') for (const k of Object.keys(v)) { walk(v[k], path + '.' + k, depth + 1); if (bad.length > 5) return; }
+  };
+  if (!s || typeof s !== 'object') return ['estado ausente'];
+  walk(s, 'S', 0);
+  if (!(s.stage >= 1) || !(s.hero >= 1) || !Array.isArray(s.allies) || !Array.isArray(s.inv)) bad.push('campos obrigatórios');
+  if (s.inv.length > INV_MAX) bad.push('inventário acima do limite');
+  return bad;
+}
 
-function parseSave(text) {
-  if (!text) return null;
+/* ---------- armazenamento ---------- */
+const Store = {
+  backend: null,
+  init(b) {
+    try {
+      const st = b !== undefined ? b : globalThis.localStorage;
+      const t = 'laminaRunica.__probe';
+      st.setItem(t, '1'); st.removeItem(t);
+      this.backend = st;
+    } catch (e) { this.backend = null; }
+    return !!this.backend;
+  },
+  get(k) { try { return this.backend ? this.backend.getItem(k) : null; } catch (e) { return null; } },
+  set(k, v) {
+    if (!this.backend) return 'unavailable';
+    try { this.backend.setItem(k, v); return ''; }
+    catch (e) { return (e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22 || e.code === 1014)) ? 'quota' : 'error'; }
+  },
+  del(k) { try { if (this.backend) this.backend.removeItem(k); } catch (e) {} },
+};
+// Cada aba tem um id; a revisão cresce a cada gravação. Uma aba antiga não sobrescreve uma revisão mais nova.
+const Session = { tab: Math.random().toString(36).slice(2, 10) + Date.now().toString(36), knownRev: 0, lastSnapAt: 0 };
+
+function encodeSave(state, meta) {
+  const data = JSON.stringify(state);
+  return JSON.stringify({ fmt: SAVE_FMT, v: VERSION, rev: meta.rev || 0, at: meta.at || Date.now(), tab: meta.tab || '', h: hash(data), data });
+}
+// Leitura rápida do envelope (sem migrar): usada para conflitos e para decidir o que vira backup.
+function peekSave(text) {
   try {
-    const wrap = JSON.parse(text);
-    if (!wrap || typeof wrap.data !== 'string') return null;
-    if (wrap.h && wrap.h !== hash(wrap.data)) return null;      // salvamento corrompido
-    return fromRaw(JSON.parse(wrap.data));
-  } catch (e) { return null; }
+    const w = JSON.parse(text);
+    if (!w || typeof w.data !== 'string') return { valid: false };
+    const valid = !w.h || w.h === hash(w.data);
+    return { valid, rev: Math.floor(+w.rev) || 0, at: +w.at || 0, tab: typeof w.tab === 'string' ? w.tab : '' };
+  } catch (e) { return { valid: false }; }
 }
-function serialize() {
-  const data = JSON.stringify(S);
-  return JSON.stringify({ h: hash(data), data });
+const SAVE_ERRORS = {
+  empty: 'vazio', too_big: 'grande demais', json: 'dados ilegíveis (JSON inválido)', format: 'formato desconhecido',
+  checksum: 'verificação de integridade falhou', future: 'criado por uma versão mais nova do jogo', fields: 'campos obrigatórios ausentes',
+};
+function decodeSave(text) {
+  if (!text) return { ok: false, error: 'empty' };
+  if (text.length > MAX_SAVE_CHARS) return { ok: false, error: 'too_big' };
+  let w, raw;
+  try { w = JSON.parse(text); } catch (e) { return { ok: false, error: 'json' }; }
+  if (!w || typeof w !== 'object' || typeof w.data !== 'string') return { ok: false, error: 'format' };
+  if (w.h && w.h !== hash(w.data)) return { ok: false, error: 'checksum' };
+  try { raw = JSON.parse(w.data); } catch (e) { return { ok: false, error: 'json' }; }
+  return decodeRaw(raw, { rev: Math.floor(+w.rev) || 0, at: +w.at || 0, tab: typeof w.tab === 'string' ? w.tab : '' });
 }
+function decodeRaw(raw, meta) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ok: false, error: 'format' };
+  if (typeof raw.stage !== 'number' || typeof raw.hero !== 'number' || !Array.isArray(raw.allies)) return { ok: false, error: 'fields' };
+  const v = Math.floor(+raw.v) || 1;
+  if (v > VERSION) return { ok: false, error: 'future', v };
+  try {
+    const { state, fixes } = fromRawChecked(raw);
+    return { ok: true, state, fixes, v, meta: meta || {} };
+  } catch (e) { return { ok: false, error: 'format' }; }
+}
+function parseSave(text) { const r = decodeSave(text); return r.ok ? r.state : null; }
+
+function writeSnapshot(text, now) {
+  let slot = 0, oldest = Infinity;
+  for (let i = 0; i < SNAP_COUNT; i++) {
+    const t = Store.get(SNAP_KEY + i);
+    const at = t ? (peekSave(t).at || 0) : -1;
+    if (at < oldest) { oldest = at; slot = i; }
+  }
+  if (!Store.set(SNAP_KEY + slot, text)) Session.lastSnapAt = now;
+}
+// Grava o estado com: validação, detecção de conflito entre abas, backup do anterior válido, verificação por leitura.
+function writeSave(state, opts = {}) {
+  if (!Store.backend) return { ok: false, error: 'unavailable' };
+  const problems = validateState(state);
+  if (problems.length) return { ok: false, error: 'invalid', problems };
+  const curText = Store.get(SAVE_KEY);
+  const cur = curText ? peekSave(curText) : null;
+  if (cur && cur.valid && cur.tab && cur.tab !== Session.tab && cur.rev > Session.knownRev) return { ok: false, error: 'conflict', other: cur };
+  const now = Date.now();
+  const rev = Math.max(Session.knownRev, cur && cur.valid ? cur.rev : 0) + 1;
+  const text = encodeSave(state, { rev, at: now, tab: Session.tab });
+  if (text.length > MAX_SAVE_CHARS) return { ok: false, error: 'too_big' };
+  if (curText && curText !== text) {
+    if (cur.valid) Store.set(BACKUP_KEY, curText);                        // falha aqui não impede o principal
+    else if (Store.get(CORRUPT_KEY) !== curText) Store.set(CORRUPT_KEY, curText);
+  }
+  let err = Store.set(SAVE_KEY, text);
+  if (err === 'quota') {                                                  // libera só as cópias rotativas e tenta de novo
+    for (let i = 0; i < SNAP_COUNT; i++) Store.del(SNAP_KEY + i);
+    err = Store.set(SAVE_KEY, text);
+  }
+  if (err) return { ok: false, error: err };
+  if (Store.get(SAVE_KEY) !== text) return { ok: false, error: 'verify' };
+  Session.knownRev = rev;
+  if (opts.snapshot || now - Session.lastSnapAt >= SNAP_EVERY) writeSnapshot(text, now);
+  return { ok: true, rev, at: now, size: text.length };
+}
+// Cópia de segurança nomeada (antes de importar, apagar, trocar pela nuvem…). Nunca é carregada sem pedir.
+function writeSafety(reason, text) {
+  if (!text) return false;
+  return !Store.set(SAFETY_KEY + reason, JSON.stringify({ reason, at: Date.now(), save: text }));
+}
+function readSafety(reason) {
+  try { const o = JSON.parse(Store.get(SAFETY_KEY + reason) || 'null'); return o && typeof o.save === 'string' ? o : null; } catch (e) { return null; }
+}
+
+// Decide o que carregar ao abrir o jogo. Nunca escolhe em silêncio um save antigo; nunca apaga nada.
+function chooseLoad() {
+  const mainText = Store.get(SAVE_KEY);
+  const main = mainText ? decodeSave(mainText) : null;
+  if (main && main.ok) return { kind: 'ok', res: main, text: mainText };
+  const backupText = Store.get(BACKUP_KEY);
+  const others = [];
+  if (backupText) others.push({ source: 'backup', text: backupText, res: decodeSave(backupText) });
+  for (let i = 0; i < SNAP_COUNT; i++) { const t = Store.get(SNAP_KEY + i); if (t) others.push({ source: 'snap' + i, text: t, res: decodeSave(t) }); }
+  if (!mainText && !others.length) return { kind: 'fresh' };
+  if (main && main.error === 'future') return { kind: 'future', main, mainText };
+  const valid = others.filter(o => o.res.ok).sort((a, b) => (b.res.meta.at || b.res.state.lastSave) - (a.res.meta.at || a.res.state.lastSave));
+  const backup = others.find(o => o.source === 'backup');
+  // Principal ilegível e backup recente válido: comportamento documentado (carrega o backup e avisa).
+  if (mainText && backup && backup.res.ok) return { kind: 'backup', res: backup.res, text: backup.text, mainText, mainError: main.error };
+  return { kind: 'recover', mainText, mainError: main ? main.error : 'missing', candidates: valid };
+}
+
+// Tempo offline a partir do maior horário já registrado: voltar o relógio não repete ganhos.
+function offlineSeconds(now, lastSave, wallMax) {
+  const ref = Math.max(+lastSave || 0, +wallMax || 0);
+  if (!(ref > 0) || !isFinite(now)) return 0;
+  const s = (now - ref) / 1000;
+  return s > 0 ? Math.min(s, OFFLINE_CAP) : 0;
+}
+
+/* ---------- código de backup ----------
+   Formato LR1.<base64 do JSON do estado>.<hash>. O JSON leva o campo v (versão do save).
+   Mantido idêntico para que códigos antigos e novos sejam aceitos pelas duas versões. */
+function b64encode(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function b64decode(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+}
+function exportCodeOf(state) {
+  const json = JSON.stringify(state);
+  return 'LR1.' + b64encode(json) + '.' + hash(json);
+}
+const IMPORT_ERRORS = {
+  empty: 'Nenhum código informado.', too_big: 'O código é grande demais para ser um save do jogo.',
+  prefix: 'Isto não parece um código do Lâmina Rúnica (deve começar com LR1.).', base64: 'O código está incompleto ou foi alterado.',
+  checksum: 'O código foi alterado ou cortado: a verificação de integridade falhou.', json: 'O conteúdo do código está ilegível.',
+  format: 'O conteúdo não tem o formato de um save.', fields: 'O save está sem campos obrigatórios.',
+  future: 'Este código foi criado por uma versão mais nova do jogo. Atualize a página e tente de novo.',
+};
+// Decodifica em memória; nada é gravado aqui.
+function importCodeChecked(code) {
+  code = String(code || '').trim().replace(/\s+/g, '');
+  if (!code) return { ok: false, error: 'empty' };
+  if (code.length > MAX_CODE_CHARS) return { ok: false, error: 'too_big' };
+  const m = /^LR1\.([A-Za-z0-9+/=]+)\.([a-z0-9]+)$/.exec(code);
+  if (!m) return { ok: false, error: 'prefix' };
+  let json, raw;
+  try { json = b64decode(m[1]); } catch (e) { return { ok: false, error: 'base64' }; }
+  if (hash(json) !== m[2]) return { ok: false, error: 'checksum' };
+  try { raw = JSON.parse(json); } catch (e) { return { ok: false, error: 'json' }; }
+  return decodeRaw(raw, {});
+}
+function importCode(code) { const r = importCodeChecked(code); return r.ok ? r.state : null; }
+
+function saveSummary(s) {
+  return {
+    stage: s.stage, maxStage: s.maxStage, hero: s.hero, gold: s.gold, ess: s.ess, essTotal: s.essTotal,
+    allies: s.allies.filter(l => l > 0).length, items: s.inv.length + SLOT_KEYS.filter(k => s.equip[k]).length,
+    prestiges: s.prestiges, lastSave: s.lastSave,
+  };
+}
+function addCapped(a, b) { const r = a + (b > 0 && isFinite(b) ? b : 0); return r > MAX_NUM ? MAX_NUM : r; }
+/* @core-end */
 
 let S = defaults();
 let lastSaveAt = 0;
 let storageOk = true;
+let saveBlock = '';            // '' | 'recover' | 'future' | 'conflict' — enquanto bloqueado, nada é gravado
+let lastSaveError = '';
 
-function save(manual) {
-  S.lastSave = Date.now();
-  const prev = storeGet(SAVE_KEY);
-  if (prev) storeSet(BACKUP_KEY, prev);
-  storageOk = storeSet(SAVE_KEY, serialize());
+function serialize() { return encodeSave(S, { rev: Session.knownRev, at: Date.now(), tab: Session.tab }); }
+
+let saveBusy = false;
+function save(opts) {
+  if (typeof opts !== 'object' || !opts) opts = { manual: !!opts };
+  if (saveBlock) { if (opts.manual) toast(saveBlock === 'conflict' ? 'Esta aba está pausada: o jogo foi aberto em outra aba.' : 'O salvamento está pausado até você escolher uma opção de recuperação.', 'bad'); return false; }
+  if (saveBusy) return false;
+  saveBusy = true;
+  const prevLast = S.lastSave, prevWall = S.wallMax;
+  S.lastSave = Date.now(); S.wallMax = Math.max(S.wallMax || 0, S.lastSave);
+  let r;
+  try { r = writeSave(S, opts); } catch (e) { r = { ok: false, error: 'error' }; }
+  saveBusy = false;
   lastSaveAt = performance.now();
-  if (storageOk) {
+  storageOk = r.ok;
+  if (r.ok) {
+    lastSaveError = '';
     const d = $('#saveDot'); d.classList.add('show');
     clearTimeout(save._t); save._t = setTimeout(() => d.classList.remove('show'), 900);
+  } else {
+    S.lastSave = prevLast; S.wallMax = prevWall;
+    if (r.error === 'conflict') enterConflict();
+    else reportSaveError(r);
   }
-  if (manual) {
-    cloudSave();
-    toast(storageOk ? 'Jogo salvo.' : 'Não foi possível salvar neste navegador (armazenamento bloqueado).', storageOk ? '' : 'bad');
+  setSaveWarn(r.ok ? '' : r.error);
+  if (opts.manual) {
+    if (r.ok) cloudSave();
+    if (r.ok) toast('Jogo salvo.');
   }
+  return r.ok;
 }
 let dirtyTimer = null;
 function saveSoon() { clearTimeout(dirtyTimer); dirtyTimer = setTimeout(() => save(), 1500); }
 
-function loadSave() {
-  let s = parseSave(storeGet(SAVE_KEY));
-  if (!s) {
-    s = parseSave(storeGet(BACKUP_KEY));
-    if (s) setTimeout(() => toast('O salvamento principal falhou; o backup foi carregado.', 'bad'), 600);
-  }
-  return s;
+const SAVE_FAIL_TXT = {
+  unavailable: 'O armazenamento deste navegador está bloqueado (modo privado ou permissões). O progresso não está sendo salvo: use o código de backup.',
+  quota: 'O armazenamento do navegador está cheio. O progresso não foi salvo. Libere espaço ou exporte o código de backup.',
+  invalid: 'Foi detectado um valor inválido no estado do jogo. O último salvamento válido foi mantido.',
+  too_big: 'O salvamento ficou grande demais e não foi gravado.',
+  verify: 'O navegador não confirmou a gravação. Tente salvar de novo.',
+  error: 'Erro ao gravar no navegador. Tente salvar de novo.',
+};
+let lastFailToast = { k: '', t: -1e9 };
+function reportSaveError(r) {
+  lastSaveError = r.error;
+  const now = performance.now();
+  if (lastFailToast.k === r.error && now - lastFailToast.t < 60000) return;
+  lastFailToast = { k: r.error, t: now };
+  toast('⚠ ' + (SAVE_FAIL_TXT[r.error] || SAVE_FAIL_TXT.error), 'bad');
+}
+function setSaveWarn(err) {
+  const b = $('#saveWarn'); if (!b) return;
+  const show = !!err && err !== 'conflict';
+  b.hidden = !show;
 }
 
-function exportCode() {
-  const json = JSON.stringify(S);
-  return 'LR1.' + btoa(unescape(encodeURIComponent(json))) + '.' + hash(json);
-}
-function importCode(code) {
-  code = (code || '').trim();
-  const m = /^LR1\.([A-Za-z0-9+/=]+)\.([a-z0-9]+)$/.exec(code);
-  if (!m) return null;
-  try {
-    const json = decodeURIComponent(escape(atob(m[1])));
-    if (hash(json) !== m[2]) return null;
-    return fromRaw(JSON.parse(json));
-  } catch (e) { return null; }
-}
+function exportCode() { return exportCodeOf(S); }
 
 /* ---------- salvamento na nuvem (quando a página roda no claude.ai com login) ---------- */
 const cloud = { ref: null, ok: false, busy: false, at: 0, last: 0 };
@@ -568,22 +889,46 @@ async function cloudInit() {
     cloud.ref = db.doc('data/users/' + id + '/save');
     const snap = await Promise.race([cloud.ref.get(), wait(10000)]);
     if (!snap) return;
-    cloud.ok = true;
     if (snap.exists) {
       const d = snap.data() || {};
-      const s = parseSave(typeof d.save === 'string' ? d.save : '');
-      if (s && s.lastSave > S.lastSave + 5000) {
-        const away = (Date.now() - s.lastSave) / 1000;
-        applyState(s);
-        offlineGains(away, false);
-        toast('Progresso da nuvem carregado.', 'gold');
+      const text = typeof d.save === 'string' ? d.save : '';
+      const r = decodeSave(text);
+      if (r.ok && r.state.lastSave > S.lastSave + 5000) {
+        // Não substitui em silêncio um progresso local de verdade: só carrega sozinho se este aparelho está no começo.
+        const localFresh = S.maxStage <= 2 && S.prestiges === 0 && S.essTotal === 0 && S.stats.taps < 200;
+        if (localFresh && !saveBlock) { useCloud(r.state, text); return; }
+        if (!saveBlock) { askCloud(r.state, text); return; }   // cloud.ok só liga depois da escolha
       }
     }
+    cloud.ok = true;
     cloudSave();
   } catch (e) { cloud.ok = false; }
 }
+function useCloud(s, text) {
+  writeSafety('cloud', serialize());                  // o progresso local fica guardado
+  const away = offlineSeconds(Date.now(), s.lastSave, s.wallMax);
+  applyState(s);
+  if (away > 0) offlineGains(away, false);
+  cloud.ok = true; save();
+  toast('Progresso da nuvem carregado. O progresso anterior deste aparelho ficou guardado nas Configurações.', 'gold');
+}
+function askCloud(s, text) {
+  const a = saveSummary(S), b = saveSummary(s);
+  openModal(`<h2>Há dois progressos diferentes</h2>
+    <p>Sua conta tem um progresso salvo mais recente do que o deste aparelho. Escolha qual usar. O outro fica guardado como cópia de segurança.</p>
+    ${summaryCard('Deste aparelho', a)}${summaryCard('Da nuvem (sua conta)', b)}
+    <div class="btns"><button class="btn primary" id="useCloud">Usar o da nuvem</button><button class="btn" id="keepLocal">Manter o deste aparelho</button></div>`,
+    sh => {
+      sh.querySelector('#useCloud').addEventListener('click', () => { closeModal(); useCloud(s, text); });
+      sh.querySelector('#keepLocal').addEventListener('click', () => {
+        writeSafety('cloudRemote', text);
+        closeModal(); cloud.ok = true; cloudSave();
+        toast('Mantido o progresso deste aparelho. A cópia da nuvem ficou guardada nas Configurações.');
+      });
+    }, { locked: true });
+}
 async function cloudSave() {
-  if (!cloud.ok || cloud.busy) return;
+  if (!cloud.ok || cloud.busy || saveBlock) return;
   cloud.busy = true;
   cloud.last = performance.now();
   try {
@@ -642,6 +987,7 @@ function todayKey(d = new Date()) { return `${d.getFullYear()}-${String(d.getMon
    FÓRMULAS DO JOGO
    ========================================================= */
 const art = id => S.arts[id] || 0;
+function gainGold(g) { if (!(g > 0)) return; S.gold = addCapped(S.gold, g); S.stats.gold = addCapped(S.stats.gold, g); }
 const skillActive = i => S.skills[i].until > S.clock;
 
 function zoneOf(stage) { return ZONES[Math.floor((stage - 1) / 10) % ZONES.length]; }
@@ -710,13 +1056,15 @@ function audioInit() {
     master = AC.createGain(); master.connect(AC.destination);
   } catch (e) { AC = null; }
 }
-function tone(freq, dur, type = 'square', vol = 0.15, slide = 0, delay = 0) {
+function tone(freq, dur, type = 'square', vol = 0.15, slide = 0, delay = 0, bus) {
   if (!AC || !S.settings.sound) return;
+  const level = bus === 'music' ? S.settings.musicVol : S.settings.volume;
+  if (level <= 0) return;
   const t = AC.currentTime + delay;
   const o = AC.createOscillator(), g = AC.createGain();
   o.type = type; o.frequency.setValueAtTime(freq, t);
   if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq * slide), t + dur);
-  g.gain.setValueAtTime(vol * S.settings.volume, t);
+  g.gain.setValueAtTime(vol * level, t);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.03);
 }
@@ -923,6 +1271,7 @@ function spawn(forceBoss) {
   const r = rng(seed);
   const chest = !boss && S.stage >= 3 && Math.random() < 0.03;
   const ancient = boss && S.stage % 10 === 0;
+  const shiny = !boss && !chest && Math.random() < 0.02;      // variante rara: só aparência, mesma recompensa
   const zone = zoneOf(S.stage);
   let hp = hpFor(S.stage);
   if (boss) hp *= 6;
@@ -930,14 +1279,14 @@ function spawn(forceBoss) {
   if (chest) hp *= 0.6;
   foe = {
     boss, chest, ancient, seed, hp, maxHp: hp,
-    name: chest ? 'Baú Vivo' : ancient ? makeName(r, false) + ', o Ancestral' : makeName(r, boss),
+    shiny, name: chest ? 'Baú Vivo' : ancient ? makeName(r, false) + ', o Ancestral' : (shiny ? '✦ ' : '') + makeName(r, boss),
     hue: (zone.hue + (r() - 0.5) * 140 + 360) % 360,
     lobes: 3 + Math.floor(r() * 5), phase: r() * 6.28, amp: 0.05 + r() * 0.09,
     eyes: boss ? 2 + Math.floor(r() * 2) : 1 + Math.floor(r() * 3),
     horns: boss || r() < 0.55, hornLen: 0.35 + r() * 0.35, spikes: r() < 0.4, sat: 55 + r() * 30,
     born: 0, hit: 0, dead: false, deathT: 0, timer: boss ? bossTime() : 0,
   };
-  if (boss) { SFX.boss(); vibrate(40); }
+  if (boss) { SFX.boss(); vibrate(40); moment.boss = { t: 0, ancient }; }
   updateFoeUI(true);
 }
 
@@ -948,10 +1297,13 @@ function killFoe() {
   if (f.boss) g *= 6;
   if (f.ancient) g *= 2;
   if (f.chest) { g *= 12; S.stats.chests++; bossDrop(false, true); toast(`Baú Vivo derrotado! +${fmt(g)} de ouro`, 'gold'); }
-  S.gold += g; S.stats.gold += g; S.stats.kills++;
+  gainGold(g); S.stats.kills++;
   fx.coinBurst(f.boss || f.chest ? 14 : 5);
   if (S.settings.dmgNums) { const c = scene.monster(); fx.number(g, c.x, c.y - c.r * 0.9, 'gold'); }
   fx.dieBurst();
+  { const c = scene.monster(); const col = f.ancient ? '#c58bff' : f.boss ? '#ff8a95' : f.chest ? '#ffc94a' : f.shiny ? '#fff3a8' : `hsl(${f.hue},80%,70%)`;
+    fx.ring(c.x, c.y, c.r * 0.4, c.r * (f.boss ? 2.2 : 1.4), col, f.boss ? 0.7 : 0.4, f.boss ? 8 : 4, f.boss || f.chest);
+    if (f.boss) { fx.ring(c.x, c.y, c.r * 0.2, c.r * 3, '#ffffff', 0.9, 3); fx.flash(f.ancient ? 'rgba(197,139,255,A)' : 'rgba(255,220,160,A)', 0.25); hero.win = 1.2; } }
   SFX.coin();
   questAdd('kills', 1);
   if (f.boss) {
@@ -975,6 +1327,7 @@ function killFoe() {
   } else {
     S.wave = Math.min(WAVES - 1, S.wave + 1);
   }
+  if (f.chest) saveSoon();
   spawnDelay = 0.4;
   uiDirty = true;
 }
@@ -982,6 +1335,7 @@ function killFoe() {
 function bossEscaped() {
   S.bossFailed = true; S.wave = WAVES - 1; S.farmKills = 0;
   toast('O chefe escapou! Fortaleça-se e desafie de novo.', 'bad');
+  hero.hurt = 0.8;
   SFX.fail(); vibrate(60);
   spawn(false);
 }
@@ -1024,7 +1378,7 @@ function catchWisp() {
     toast(`O espírito ativou ${SKILLS[i].name} de graça!`, 'gold');
   } else {
     const g = goldFor(S.stage) * goldMult() * (20 + S.stage * 0.5) * bonus;
-    S.gold += g; S.stats.gold += g;
+    gainGold(g);
     toast(`O espírito deixou +${fmt(g)} de ouro!`, 'gold');
   }
   uiDirty = true; saveSoon();
@@ -1046,10 +1400,10 @@ function doTap(x, y, auto) {
   let d = tapDmg() * comboMult();
   if (crit) { d *= critMult(); S.stats.crits++; }
   S.stats.taps++;
-  if (d > S.stats.maxTap) S.stats.maxTap = d;
+  if (d > S.stats.maxTap) S.stats.maxTap = Math.min(d, MAX_NUM);
   hero.atk = 0.14;
   fx.slash(x, y, crit);
-  if (crit) { SFX.crit(); fx.shake(4); if (!auto) vibrate(15); }
+  if (crit) { SFX.crit(); fx.shake(4); if (!auto) vibrate(15); if (!auto || Math.random() < 0.2) fx.ring(x, y, 6, 46, '#ffd84a', 0.3, 4); }
   else { SFX.hit(); if (!auto) vibrate(6); }
   damage(d, x, y, crit ? 'crit' : 'tap');
 }
@@ -1140,7 +1494,7 @@ function prestige() {
   if (g <= 0) return;
   const keep = { ess: S.ess + g, essTotal: S.essTotal + g, arts: S.arts, prestiges: S.prestiges + 1, stats: S.stats, ach: S.ach,
     daily: S.daily, quests: S.quests, ancientBest: S.ancientBest, allyForms: S.allyForms,
-    equip: S.equip, inv: S.inv, frags: S.frags, pity: S.pity, nextItemId: S.nextItemId, settings: S.settings, maxStage: S.maxStage, created: S.created, clock: S.clock };
+    equip: S.equip, inv: S.inv, frags: S.frags, pity: S.pity, nextItemId: S.nextItemId, settings: S.settings, maxStage: S.maxStage, created: S.created, clock: S.clock, wallMax: S.wallMax };
   S = Object.assign(defaults(), keep);
   S.mana = manaMax();
   SFX.prestige(); vibrate([30, 60, 30]);
@@ -1148,7 +1502,7 @@ function prestige() {
   structDirty = true; uiDirty = true;
   foe = null; spawnDelay = 0.6;
   scene.zoneChanged();
-  save(); cloudSave();
+  save({ snapshot: true }); cloudSave();
   toast(`Você renasceu com ${g} essências! Dano permanente agora: ×${fmtPlain(dmgMult())}`, 'gold');
 }
 function challengeBoss() {
@@ -1159,7 +1513,6 @@ function challengeBoss() {
 }
 
 /* ---------- equipamentos ---------- */
-function itemName(it) { return `${SLOT_DEF[it.slot].models[it.model]} ${ITEM_SUFFIX[it.rar]}`; }
 function rarityWeights(ancient) {
   const w = RARITIES.map(r => ancient ? r.wa : r.w);
   const luck = 1 + S.pity * 0.025;              // sorte acumulada aumenta Lendário e Mítico
@@ -1184,7 +1537,6 @@ function makeItem(slot, rar, lvl, ex) {
   it.name = itemName(it);
   return it;
 }
-function fragValue(it) { return RARITIES[it.rar].frag * (1 + Math.floor(it.lvl / 25)) + it.up * 2; }
 function upCost(it) { return Math.ceil(5 * Math.pow(1.3, it.up) * (1 + it.rar * 0.6)); }
 function itemCompare(it) {
   const cur = S.equip[it.slot];
@@ -1258,9 +1610,13 @@ function grantItem(it) {
   }
   S.inv.push(it);
   structDirty = true;
+  { const c = scene.monster();
+    if (it.rar === 2) fx.ring(c.x, c.y - c.r * 0.5, 8, c.r * 1.1, rc, 0.5, 3);
+    if (it.rar >= 3) fx.ring(c.x, c.y - c.r * 0.5, 10, c.r * 1.8, rc, 0.8, 6, true);
+    if (it.rar >= 4) { fx.beam(c.x, scene.ground(), rc); fx.flash(it.rar === 5 ? 'rgba(255,93,108,A)' : 'rgba(255,201,74,A)', 0.3); } }
   if (it.rar >= 3) {
     const c = scene.monster();
-    for (let i = 0; i < 40; i++) fx.spark(c.x, c.y - c.r, rc, 1.6);
+    for (let i = 0; i < (it.rar >= 4 ? 70 : 40); i++) fx.spark(c.x, c.y - c.r, rc, 1.6);
     fx.shake(8); vibrate([30, 40, 30]);
     [523, 784, 1046, 1568].forEach((f, i) => tone(f, 0.25, 'triangle', 0.1, 0, i * 0.08));
   } else SFX.coin();
@@ -1296,7 +1652,7 @@ function hideLoot(id) { if (!id || id === lootId) { $('#loot').hidden = true; cl
 /* ---------- missões diárias ---------- */
 function ensureQuests() {
   const d = todayKey();
-  if (S.quests.day === d) return;
+  if (S.quests.day === d || S.quests.day > d) return;   // relógio voltou: mantém as missões atuais
   const types = QUEST_TYPES.slice().sort(() => Math.random() - 0.5).slice(0, 3);
   const q = { day: d, bonus: false };
   types.forEach((t, k) => { q[QKEYS[k]] = { type: t.type, goal: t.goals[Math.floor(Math.random() * t.goals.length)], prog: 0, done: false }; });
@@ -1316,7 +1672,7 @@ function claimQuest(k) {
   if (!q || q.done || q.prog < q.goal) return false;
   q.done = true; S.stats.quests++;
   const g = questGold();
-  S.gold += g; S.stats.gold += g;
+  gainGold(g);
   SFX.win(); vibrate([15, 30, 15]);
   toast(`Missão concluída! +${fmt(g)} de ouro`, 'gold');
   save(); uiDirty = true;
@@ -1360,10 +1716,10 @@ function musicTick() {
   const root = 196 * Math.pow(2, [0, 2, -2, 3, 5, -3, 1, -5][z] / 12);
   const st = musicStep++ % 16;
   if (st === 0) musicPat = Array.from({ length: 16 }, (_, k) => (k % 2 === 0 || Math.random() < 0.3) && Math.random() < 0.75 ? PENTA[Math.floor(Math.random() * PENTA.length)] : -1);
-  if (st % 8 === 0) tone(root / 2, 1.6, 'triangle', 0.07);
-  if (st % 8 === 4) tone(root / 2 * Math.pow(2, 7 / 12), 1.2, 'triangle', 0.05);
+  if (st % 8 === 0) tone(root / 2, 1.6, 'triangle', 0.07, 0, 0, 'music');
+  if (st % 8 === 4) tone(root / 2 * Math.pow(2, 7 / 12), 1.2, 'triangle', 0.05, 0, 0, 'music');
   const n = musicPat[st];
-  if (n >= 0) tone(root * Math.pow(2, n / 12), 0.35, 'sine', 0.045);
+  if (n >= 0) tone(root * Math.pow(2, n / 12), 0.35, 'sine', 0.045, 0, 0, 'music');
 }
 setInterval(musicTick, 240);
 
@@ -1371,6 +1727,7 @@ setInterval(musicTick, 240);
 function dailyState() {
   const today = todayKey();
   if (S.daily.last === today) return { available: false, day: S.daily.streak };
+  if (S.daily.last > today) return { available: false, day: S.daily.streak, clockBack: true };   // relógio voltou
   const y = new Date(); y.setDate(y.getDate() - 1);
   const day = S.daily.last === todayKey(y) ? (S.daily.streak % 7) + 1 : 1;
   return { available: true, day };
@@ -1384,7 +1741,7 @@ function claimDaily() {
   const st = dailyState();
   if (!st.available) return;
   const r = dailyReward(st.day);
-  S.gold += r.gold; S.stats.gold += r.gold;
+  gainGold(r.gold);
   if (r.ess) { S.ess += r.ess; S.essTotal += r.ess; }
   S.daily = { last: todayKey(), streak: st.day };
   SFX.win(); vibrate([20, 40, 20]);
@@ -1427,7 +1784,7 @@ function offlineGains(seconds, showModal) {
     kills = Math.floor(seconds / (hp / d + 0.4));
     gold = kills * goldFor(S.stage) * goldBase();
   }
-  if (gold > 0) { S.gold += gold; S.stats.gold += gold; S.stats.kills += kills; }
+  if (gold > 0) { gainGold(gold); S.stats.kills = addCapped(S.stats.kills, kills); }
   if (showModal && seconds >= 60 && S.settings.offlineModal) {
     openModal(`
       <h2>Bem-vindo de volta!</h2>
@@ -1449,7 +1806,7 @@ const cv = $('#cv');
 const ctx = cv.getContext('2d');
 let W = 0, H = 0, DPR = 1;
 let bgCanvas = null;
-const hero = { atk: 0 };
+const hero = { atk: 0, win: 0, hurt: 0 };
 const allyPos = [];
 
 const scene = {
@@ -1470,8 +1827,10 @@ const scene = {
     this.zoneChanged();
   },
   zoneChanged() {
-    const z = zoneOf(S.stage);
-    this.zoneKey = z.name;
+    const z = zoneOf(S.stage), zi = zoneIndex(S.stage);
+    if (this.zoneIdx !== undefined && this.zoneIdx !== zi && this.stageKey !== undefined) moment.zone = { t: 0, name: z.name, idx: zi };
+    this.zoneKey = z.name; this.zoneIdx = zi; this.stageKey = S.stage;
+    const pr = rng(S.stage * 131 + 17);
     bgCanvas = document.createElement('canvas');
     bgCanvas.width = cv.width; bgCanvas.height = cv.height;
     const b = bgCanvas.getContext('2d');
@@ -1496,6 +1855,7 @@ const scene = {
       b.lineTo(W, H); b.closePath(); b.fill();
     };
     layer(z.far, H * 0.64, H * 0.32, 5);
+    drawZoneProps(b, zi, 'far', pr, W, H, this.ground());
     layer(z.near, H * 0.78, H * 0.15, 8);
     b.fillStyle = z.ground; b.fillRect(0, this.ground(), W, H);
     b.fillStyle = 'rgba(0,0,0,0.18)'; b.fillRect(0, this.ground(), W, 3);
@@ -1503,6 +1863,7 @@ const scene = {
       b.fillStyle = `rgba(0,0,0,${0.05 + r() * 0.1})`;
       b.fillRect(r() * W, this.ground() + 6 + r() * (H - this.ground()), 4 + r() * 12, 2);
     }
+    drawZoneProps(b, zi, 'near', pr, W, H, this.ground());
     drawWalls(b, z, this.layout || wallLayout());
     const vg = b.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.35, W / 2, H * 0.55, Math.max(W, H) * 0.8);
     vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(5,3,15,0.45)');
@@ -1510,10 +1871,233 @@ const scene = {
   },
 };
 
+/* ---------- cenário por região: adereços desenhados uma vez no fundo em cache ----------
+   far = atrás da segunda camada de montanhas; near = sobre a linha do chão. r = gerador com semente do estágio. */
+function zoneIndex(stage) { return Math.floor((stage - 1) / 10) % ZONES.length; }
+function drawZoneProps(b, zi, layer, r, W, H, gy) {
+  const tri = (x, y, w, h, col) => { b.fillStyle = col; b.beginPath(); b.moveTo(x - w / 2, y); b.lineTo(x, y - h); b.lineTo(x + w / 2, y); b.closePath(); b.fill(); };
+  const glow = (x, y, rad, col) => { const g = b.createRadialGradient(x, y, 0, x, y, rad); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); b.fillStyle = g; b.fillRect(x - rad, y - rad, rad * 2, rad * 2); };
+  const u = Math.min(W / 400, H / 420);
+  if (zi === 0) {                                   // Campos de Âmbar: moinho, árvores redondas, trigo e fardos
+    if (layer === 'far') {
+      const mx = W * (0.15 + r() * 0.2), my = H * 0.66;
+      b.fillStyle = 'rgba(70,40,60,0.75)';
+      b.fillRect(mx - 6 * u, my - 46 * u, 12 * u, 46 * u);
+      tri(mx, my - 46 * u, 22 * u, 14 * u, 'rgba(70,40,60,0.75)');
+      b.save(); b.translate(mx, my - 44 * u); b.rotate(r() * 1.5);
+      for (let k = 0; k < 4; k++) { b.rotate(Math.PI / 2); b.fillRect(-2 * u, 0, 4 * u, 30 * u); }
+      b.restore();
+      for (let i = 0; i < 6; i++) { const x = r() * W, s = (8 + r() * 10) * u; b.fillStyle = 'rgba(60,45,55,0.6)'; b.beginPath(); b.arc(x, H * 0.7 - s, s, 0, Math.PI * 2); b.fill(); b.fillRect(x - 1.5 * u, H * 0.7 - s, 3 * u, s); }
+    } else {
+      for (let x = 0; x < W; x += 5 * u) { const h = (8 + r() * 14) * u; b.strokeStyle = `hsla(${38 + r() * 14},80%,${45 + r() * 20}%,0.75)`; b.lineWidth = 1.4; b.beginPath(); b.moveTo(x, gy + 1); b.quadraticCurveTo(x + 2 * u, gy - h * 0.6, x + 3 * u, gy - h); b.stroke(); }
+      for (let i = 0; i < 2; i++) { const x = W * (0.05 + r() * 0.9); b.fillStyle = '#b8862e'; b.beginPath(); b.ellipse(x, gy - 7 * u, 14 * u, 9 * u, 0, Math.PI, 0); b.fill(); b.fillRect(x - 14 * u, gy - 7 * u, 28 * u, 7 * u); b.strokeStyle = 'rgba(90,60,20,.6)'; b.beginPath(); b.moveTo(x - 10 * u, gy - 5 * u); b.lineTo(x + 10 * u, gy - 5 * u); b.stroke(); }
+    }
+  } else if (zi === 1) {                            // Floresta Sussurrante: fileiras de pinheiros, troncos, cogumelos luminosos
+    if (layer === 'far') {
+      for (let row = 0; row < 2; row++) for (let i = 0; i < 16; i++) {
+        const x = (i / 15) * W + (r() - 0.5) * 20, h = (40 + r() * 40) * u * (row ? 1.2 : 0.8), y = H * (0.66 + row * 0.06);
+        const col = row ? 'rgba(12,40,34,0.9)' : 'rgba(20,60,52,0.7)';
+        tri(x, y, h * 0.5, h, col); tri(x, y - h * 0.35, h * 0.4, h * 0.8, col);
+      }
+    } else {
+      for (const side of [0.18, 0.86]) { const x = W * side + (r() - 0.5) * 20 * u; b.fillStyle = '#1a2a1c'; b.fillRect(x - 7 * u, gy - 120 * u, 14 * u, 120 * u); tri(x, gy - 80 * u, 70 * u, 90 * u, '#10261c'); tri(x, gy - 120 * u, 56 * u, 80 * u, '#143024'); }
+      for (let i = 0; i < 5; i++) { const x = W * (0.1 + r() * 0.8), s = (3 + r() * 3) * u; glow(x, gy - s, 14 * u, 'rgba(120,255,200,0.35)'); b.fillStyle = '#e8fff4'; b.fillRect(x - 1, gy - s, 2, s); b.fillStyle = '#7dffc8'; b.beginPath(); b.ellipse(x, gy - s, s * 1.4, s * 0.8, 0, Math.PI, 0); b.fill(); }
+    }
+  } else if (zi === 2) {                            // Pântano de Cinzas: árvores mortas, juncos, névoa
+    if (layer === 'far') {
+      b.strokeStyle = 'rgba(30,28,32,0.85)'; b.lineCap = 'round';
+      for (let i = 0; i < 5; i++) {
+        const x = W * (0.08 + r() * 0.84), y = H * 0.72, h = (50 + r() * 50) * u;
+        b.lineWidth = 5 * u; b.beginPath(); b.moveTo(x, y); b.quadraticCurveTo(x + 8 * u, y - h * 0.5, x - 4 * u, y - h); b.stroke();
+        b.lineWidth = 2.2 * u;
+        for (let k = 0; k < 4; k++) { const by = y - h * (0.4 + k * 0.15), d = (k % 2 ? 1 : -1); b.beginPath(); b.moveTo(x, by); b.quadraticCurveTo(x + d * 14 * u, by - 6 * u, x + d * 22 * u, by - 18 * u); b.stroke(); }
+      }
+    } else {
+      b.fillStyle = 'rgba(40,60,50,0.55)'; b.fillRect(0, gy - 4 * u, W, 8 * u);
+      b.strokeStyle = 'rgba(70,80,50,0.85)'; b.lineWidth = 1.6;
+      for (let i = 0; i < 40; i++) { const x = r() * W, h = (10 + r() * 22) * u; b.beginPath(); b.moveTo(x, gy + 2); b.lineTo(x + (r() - 0.5) * 6, gy - h); b.stroke(); if (r() < 0.3) { b.fillStyle = '#5a3a28'; b.fillRect(x - 1.5, gy - h, 3, 7 * u); } }
+      for (let i = 0; i < 5; i++) { b.fillStyle = 'rgba(200,210,200,0.07)'; b.beginPath(); b.ellipse(r() * W, gy - (10 + r() * 50) * u, (80 + r() * 90) * u, 12 * u, 0, 0, Math.PI * 2); b.fill(); }
+    }
+  } else if (zi === 3) {                            // Picos Gelados: picos altos com neve, cristais de gelo
+    if (layer === 'far') {
+      for (let i = 0; i < 4; i++) {
+        const x = W * (0.1 + i * 0.27 + (r() - 0.5) * 0.1), h = H * (0.32 + r() * 0.15), y = H * 0.7, w = h * 1.1;
+        tri(x, y, w, h, 'rgba(90,120,170,0.85)');
+        b.fillStyle = 'rgba(245,250,255,0.95)'; b.beginPath(); b.moveTo(x, y - h); b.lineTo(x - w * 0.16, y - h * 0.68); b.lineTo(x - w * 0.06, y - h * 0.74); b.lineTo(x + w * 0.02, y - h * 0.64); b.lineTo(x + w * 0.16, y - h * 0.7); b.closePath(); b.fill();
+        b.fillStyle = 'rgba(40,60,110,0.25)'; b.beginPath(); b.moveTo(x, y - h); b.lineTo(x + w / 2, y); b.lineTo(x + w * 0.1, y); b.closePath(); b.fill();
+      }
+    } else {
+      for (let i = 0; i < 6; i++) { const x = r() * W, h = (12 + r() * 22) * u; tri(x, gy + 2, h * 0.45, h, 'rgba(190,230,255,0.85)'); tri(x + 5 * u, gy + 2, h * 0.3, h * 0.6, 'rgba(150,200,240,0.85)'); b.fillStyle = 'rgba(255,255,255,0.7)'; b.fillRect(x - 1, gy - h * 0.8, 1.5, h * 0.5); }
+    }
+  } else if (zi === 4) {                            // Deserto de Vidro: dunas, obeliscos, cacos de vidro
+    if (layer === 'far') {
+      for (let i = 0; i < 2; i++) { const x = W * (0.2 + r() * 0.6), h = (60 + r() * 50) * u; b.fillStyle = 'rgba(110,55,60,0.8)'; b.beginPath(); b.moveTo(x - 7 * u, H * 0.7); b.lineTo(x - 5 * u, H * 0.7 - h); b.lineTo(x, H * 0.7 - h - 9 * u); b.lineTo(x + 5 * u, H * 0.7 - h); b.lineTo(x + 7 * u, H * 0.7); b.closePath(); b.fill(); glow(x, H * 0.7 - h - 9 * u, 10 * u, 'rgba(255,220,150,0.6)'); }
+      b.fillStyle = 'rgba(200,120,90,0.55)';
+      b.beginPath(); b.moveTo(0, H * 0.74); for (let x = 0; x <= W; x += 10) b.lineTo(x, H * 0.74 - Math.sin(x / W * 5 + 1) * 14 * u - 10 * u); b.lineTo(W, H); b.lineTo(0, H); b.closePath(); b.fill();
+    } else {
+      for (let i = 0; i < 9; i++) { const x = r() * W, h = (6 + r() * 16) * u, hue = 170 + r() * 140; b.fillStyle = `hsla(${hue},80%,75%,0.75)`; b.beginPath(); b.moveTo(x - h * 0.3, gy + 1); b.lineTo(x + (r() - 0.5) * h * 0.4, gy - h); b.lineTo(x + h * 0.3, gy + 1); b.closePath(); b.fill(); b.fillStyle = 'rgba(255,255,255,0.8)'; b.fillRect(x - 0.5, gy - h * 0.7, 1, h * 0.4); }
+    }
+  } else if (zi === 5) {                            // Cavernas de Cristal: estalactites e aglomerados luminosos
+    if (layer === 'far') {
+      for (let x = 0; x < W; x += (14 + r() * 26) * u) { const h = (20 + r() * 70) * u; tri(x, 0, (10 + r() * 14) * u, -h, 'rgba(20,14,50,0.95)'); }
+      for (let i = 0; i < 4; i++) glow(r() * W, H * (0.2 + r() * 0.4), 60 * u, 'rgba(140,90,255,0.12)');
+    } else {
+      for (let i = 0; i < 4; i++) {
+        const x = W * (0.08 + r() * 0.84), hue = 250 + r() * 80;
+        glow(x, gy - 14 * u, 36 * u, `hsla(${hue},90%,65%,0.35)`);
+        for (let k = 0; k < 4; k++) { const h = (12 + r() * 26) * u, a = (k - 1.5) * 0.28; b.save(); b.translate(x + (k - 1.5) * 4 * u, gy + 2); b.rotate(a); b.fillStyle = `hsla(${hue},85%,${60 + k * 6}%,0.9)`; b.beginPath(); b.moveTo(-4 * u, 0); b.lineTo(0, -h); b.lineTo(4 * u, 0); b.closePath(); b.fill(); b.restore(); }
+      }
+    }
+  } else if (zi === 6) {                            // Cidadela Rubra: torres com janelas acesas, estandartes, rachaduras de lava
+    if (layer === 'far') {
+      const base = H * 0.7;
+      for (let i = 0; i < 5; i++) {
+        const x = W * (0.12 + i * 0.19 + (r() - 0.5) * 0.05), w = (18 + r() * 14) * u, h = (60 + r() * 80) * u;
+        b.fillStyle = 'rgba(30,8,14,0.92)'; b.fillRect(x - w / 2, base - h, w, h);
+        for (let k = -1; k <= 1; k += 2) b.fillRect(x + k * w * 0.35 - 3 * u, base - h - 6 * u, 6 * u, 6 * u);
+        tri(x, base - h - 4 * u, w * 1.2, 22 * u, 'rgba(30,8,14,0.92)');
+        for (let k = 0; k < 3; k++) if (r() < 0.7) { b.fillStyle = 'rgba(255,150,60,0.85)'; b.fillRect(x - 2 * u, base - h + (12 + k * 18) * u, 4 * u, 7 * u); }
+      }
+    } else {
+      b.strokeStyle = 'rgba(255,90,40,0.7)'; b.lineWidth = 2;
+      for (let i = 0; i < 6; i++) { let x = r() * W, y = gy + 6 + r() * (H - gy - 8); b.beginPath(); b.moveTo(x, y); for (let k = 0; k < 4; k++) { x += (8 + r() * 14) * u; y += (r() - 0.5) * 6; b.lineTo(x, y); } b.stroke(); }
+      for (let i = 0; i < 6; i++) { const x = r() * W; tri(x, gy + 2, 8 * u, (10 + r() * 12) * u, '#2a0a10'); }
+    }
+  } else {                                          // Abismo Estelar: nebulosa, planeta com anel, rochas flutuantes
+    if (layer === 'far') {
+      for (let i = 0; i < 3; i++) glow(r() * W, H * (0.15 + r() * 0.35), (90 + r() * 80) * u, `hsla(${260 + r() * 80},80%,60%,0.16)`);
+      const px = W * (0.2 + r() * 0.2), py = H * 0.22, pr = 34 * u;
+      const pg = b.createRadialGradient(px - pr * 0.4, py - pr * 0.4, pr * 0.1, px, py, pr);
+      pg.addColorStop(0, '#d9b8ff'); pg.addColorStop(1, '#3a1f7a');
+      b.fillStyle = pg; b.beginPath(); b.arc(px, py, pr, 0, Math.PI * 2); b.fill();
+      b.strokeStyle = 'rgba(230,210,255,0.55)'; b.lineWidth = 3 * u; b.beginPath(); b.ellipse(px, py, pr * 1.7, pr * 0.38, -0.3, 0, Math.PI * 2); b.stroke();
+      for (let i = 0; i < 70; i++) { b.globalAlpha = 0.3 + r() * 0.7; b.fillStyle = '#fff'; b.fillRect(r() * W, r() * H * 0.7, 1.2, 1.2); }
+      b.globalAlpha = 1;
+    } else {
+      for (let i = 0; i < 3; i++) {
+        const x = W * (0.15 + r() * 0.7), y = H * (0.3 + r() * 0.25), w = (26 + r() * 30) * u;
+        b.fillStyle = '#241a4a'; b.beginPath(); b.moveTo(x - w, y); b.lineTo(x + w, y); b.lineTo(x + w * 0.3, y + w * 0.8); b.lineTo(x - w * 0.4, y + w * 0.6); b.closePath(); b.fill();
+        b.fillStyle = '#3a2c70'; b.fillRect(x - w, y - 3 * u, w * 2, 4 * u);
+        glow(x, y + w * 0.7, 18 * u, 'rgba(160,120,255,0.35)');
+      }
+    }
+  }
+}
+
+/* ---------- partículas ambientes por região (posições calculadas, nada é alocado por quadro) ---------- */
+function drawAmbient(t) {
+  if (!S.settings.particles) return;
+  const zi = zoneIndex(S.stage), low = motionLow();
+  const n = low ? 8 : 18, gy = scene.ground();
+  const tt = low ? 0 : t;
+  for (let i = 0; i < n; i++) {
+    const ph = i * 97.31, a = (i * 0.618) % 1;
+    let x, y, s = 2, col, alpha = 0.6;
+    if (zi === 0) { x = (a * W + tt * (10 + i)) % W; y = gy - ((tt * (8 + i % 5 * 3) + ph) % (gy * 0.8)); col = '#ffe7a0'; alpha = 0.5; }
+    else if (zi === 1) { x = a * W + Math.sin(tt * 0.7 + ph) * 30; y = gy * (0.45 + ((i * 0.37) % 0.5)) + Math.cos(tt * 0.9 + ph) * 20; col = '#b8ffb0'; alpha = 0.25 + 0.6 * Math.max(0, Math.sin(tt * 2 + ph)); s = 2.5; }
+    else if (zi === 2) { x = (a * W - tt * (6 + i % 4)) % W; if (x < 0) x += W; y = gy - 10 - (i % 6) * 14 + Math.sin(tt + ph) * 4; col = '#c8d0c0'; alpha = 0.18; s = 3; }
+    else if (zi === 3) { x = (a * W + Math.sin(tt + ph) * 16 + tt * 6) % W; y = (tt * (30 + i % 5 * 8) + ph) % H; col = '#ffffff'; alpha = 0.75; s = 2 + (i % 3) * 0.6; }
+    else if (zi === 4) { x = (a * W + tt * (90 + i * 6)) % (W + 40) - 20; y = gy - 6 - (i % 7) * 10; col = '#ffd9a0'; alpha = 0.35; ctx.globalAlpha = alpha; ctx.fillStyle = col; ctx.fillRect(x, y, 10, 1.2); continue; }
+    else if (zi === 5) { x = a * W; y = H * (0.1 + ((i * 0.53) % 0.75)); col = '#d9c2ff'; alpha = Math.max(0, Math.sin(tt * 2.5 + ph)) * 0.9; s = 2.2; }
+    else if (zi === 6) { x = (a * W + Math.sin(tt * 2 + ph) * 10) % W; y = gy - ((tt * (25 + i % 4 * 9) + ph) % (gy * 0.9)); col = i % 2 ? '#ff7a3a' : '#ffc06a'; alpha = 0.7; s = 2; }
+    else { x = a * W; y = H * ((i * 0.41) % 0.8); col = '#ffffff'; alpha = 0.3 + 0.7 * Math.abs(Math.sin(tt * 1.5 + ph)); s = 1.6; }
+    ctx.globalAlpha = alpha; ctx.fillStyle = col; ctx.fillRect(x - s / 2, y - s / 2, s, s);
+  }
+  ctx.globalAlpha = 1;
+  if (zi === 7 && !low) {                       // cometa raro no Abismo
+    const k = (t % 9) / 9;
+    if (k < 0.12) { const cx = W * (1.1 - k * 8), cy = H * (0.05 + k * 2); ctx.strokeStyle = 'rgba(220,240,255,0.7)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + 40, cy - 14); ctx.stroke(); }
+  }
+}
+
+/* ---------- momentos: transição de região e entrada de chefe (só canvas: não bloqueiam toques) ---------- */
+const moment = { zone: null, boss: null };
+function drawMoments(dt) {
+  const low = motionLow();
+  if (moment.zone) {
+    const m = moment.zone; m.t += dt;
+    const D = 2.4;
+    if (m.t > D) moment.zone = null;
+    else {
+      const fade = low ? 0 : Math.max(0, 1 - m.t / 0.6);
+      if (fade > 0) { ctx.fillStyle = `rgba(5,3,15,${fade * 0.9})`; ctx.fillRect(0, 0, W, H); }
+      const a = Math.min(1, m.t / 0.3, (D - m.t) / 0.5);
+      ctx.globalAlpha = a; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const y = H * 0.36;
+      ctx.fillStyle = 'rgba(10,8,25,0.6)'; ctx.fillRect(0, y - 30, W, 58);
+      ctx.font = `${Math.round(11 * clamp(scene.unit(), 0.9, 1.4))}px Nunito, sans-serif`;
+      ctx.fillStyle = '#c9bfe8'; ctx.fillText(`REGIÃO ${m.idx + 1} DE ${ZONES.length}`, W / 2, y - 12);
+      ctx.font = `${Math.round(20 * clamp(scene.unit(), 0.9, 1.5))}px Bungee, Impact, sans-serif`;
+      ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(20,10,30,0.9)'; ctx.strokeText(m.name, W / 2, y + 10);
+      ctx.fillStyle = '#ffd977'; ctx.fillText(m.name, W / 2, y + 10);
+      ctx.globalAlpha = 1;
+    }
+  }
+  if (moment.boss) {
+    const m = moment.boss; m.t += dt;
+    const D = 1.7;
+    if (m.t > D) moment.boss = null;
+    else {
+      const slide = low ? 0 : Math.max(0, 1 - m.t / 0.25);
+      const a = Math.min(1, (D - m.t) / 0.4);
+      const y = H * 0.5;
+      ctx.globalAlpha = a;
+      ctx.fillStyle = m.ancient ? 'rgba(60,20,110,0.75)' : 'rgba(110,10,30,0.72)';
+      ctx.fillRect(-slide * W, y - 26, W, 52);
+      ctx.fillStyle = m.ancient ? '#c58bff' : '#ff5d6c'; ctx.fillRect(-slide * W, y - 26, W, 3); ctx.fillRect(slide * W, y + 23, W, 3);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `${Math.round(22 * clamp(scene.unit(), 0.9, 1.5))}px Bungee, Impact, sans-serif`;
+      ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(20,5,15,0.9)';
+      const txt = m.ancient ? 'CHEFE ANCESTRAL' : 'CHEFE';
+      ctx.strokeText(txt, W / 2 + slide * W, y - 4); ctx.fillStyle = '#fff'; ctx.fillText(txt, W / 2 + slide * W, y - 4);
+      ctx.font = `${Math.round(11 * clamp(scene.unit(), 0.9, 1.4))}px Nunito, sans-serif`;
+      ctx.fillStyle = '#ffd6dc'; ctx.fillText(`${Math.round(bossTime())} s para derrotá-lo`, W / 2 - slide * W, y + 15);
+      ctx.globalAlpha = 1;
+    }
+  }
+  if (foe && foe.boss && !foe.dead) {           // borda pulsante enquanto o chefe vive (mais forte no fim do tempo)
+    const urgent = foe.timer < 5;
+    const p = low ? 0.5 : (Math.sin(performance.now() / (urgent ? 120 : 400)) + 1) / 2;
+    const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.45, W / 2, H / 2, Math.max(W, H) * 0.75);
+    const c = foe.ancient ? '120,60,220' : '200,20,50';
+    g.addColorStop(0, `rgba(${c},0)`); g.addColorStop(1, `rgba(${c},${(urgent ? 0.35 : 0.16) + p * 0.12})`);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+}
+
+/* ---------- efeitos com hierarquia: anel (crítico/derrota), coluna de luz (lendário/mítico) ---------- */
+const rings = [], beams = [];
+function drawRingsBeams(dt) {
+  for (let i = rings.length - 1; i >= 0; i--) {
+    const g = rings[i]; g.t += dt;
+    if (g.t > g.life) { rings.splice(i, 1); continue; }
+    const k = g.t / g.life;
+    ctx.globalAlpha = 1 - k; ctx.strokeStyle = g.color; ctx.lineWidth = g.w * (1 - k) + 1;
+    ctx.beginPath(); ctx.arc(g.x, g.y, g.r0 + (g.r1 - g.r0) * (1 - (1 - k) * (1 - k)), 0, Math.PI * 2); ctx.stroke();
+    if (g.runes) {
+      const rr = g.r0 + (g.r1 - g.r0) * k;
+      ctx.fillStyle = g.color;
+      for (let j = 0; j < 8; j++) { const an = j / 8 * Math.PI * 2 + k * 2; const x = g.x + Math.cos(an) * rr, y = g.y + Math.sin(an) * rr; ctx.fillRect(x - 2, y - 5, 4, 10); ctx.fillRect(x - 5, y - 1, 10, 2); }
+    }
+  }
+  for (let i = beams.length - 1; i >= 0; i--) {
+    const bm = beams[i]; bm.t += dt;
+    if (bm.t > 1.6) { beams.splice(i, 1); continue; }
+    const a = Math.min(1, bm.t / 0.15) * Math.max(0, 1 - (bm.t - 0.8) / 0.8);
+    const w = 36 + Math.sin(bm.t * 20) * 4;
+    const g = ctx.createLinearGradient(bm.x - w, 0, bm.x + w, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, bm.color); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.globalAlpha = a * 0.8; ctx.fillStyle = g; ctx.fillRect(bm.x - w, 0, w * 2, bm.y);
+    ctx.globalAlpha = a; ctx.fillStyle = '#fff'; ctx.fillRect(bm.x - 2, 0, 4, bm.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
 /* ---------- efeitos ---------- */
 const parts = [], nums = [], slashes = [], projs = [], bolts = [];
-let shakeT = 0, shakeA = 0, flashT = 0;
-const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let shakeT = 0, shakeA = 0, flashT = 0, flashCol = 'rgba(220,245,255,A)';
+const reducedMotionOS = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const motionLow = () => reducedMotionOS || S.settings.reduceMotion;
 const fx = {
   number(amount, x, y, kind) {
     if (nums.length > 30) nums.shift();
@@ -1540,14 +2124,17 @@ const fx = {
     const c = scene.monster();
     for (let i = 0; i < 24; i++) this.spark(c.x + (Math.random() - 0.5) * c.r, c.y + (Math.random() - 0.5) * c.r, `hsl(${foe.hue},70%,60%)`, 1.4);
   },
-  shake(a) { if (!S.settings.shake || reducedMotion) return; shakeT = 0.25; shakeA = Math.max(shakeA, a); },
+  ring(x, y, r0, r1, color, life = 0.45, w = 5, runes = false) { if (rings.length < 12) rings.push({ x, y, r0, r1, color, life, w, runes, t: 0 }); },
+  beam(x, y, color) { if (beams.length < 3) beams.push({ x, y, color, t: 0 }); },
+  flash(col, a) { if (motionLow()) return; flashCol = col; flashT = Math.max(flashT, a); },
+  shake(a) { if (!S.settings.shake || motionLow()) return; shakeT = 0.25; shakeA = Math.max(shakeA, a); },
   lightning() {
     const c = scene.monster();
     const pts = []; let x = c.x + (Math.random() - 0.5) * 40, y = -10;
     while (y < c.y) { pts.push([x, y]); y += 20 + Math.random() * 25; x += (Math.random() - 0.5) * 50; }
     pts.push([c.x, c.y]);
     bolts.push({ pts, t: 0 });
-    flashT = 0.25;
+    flashT = 0.25; flashCol = 'rgba(220,245,255,A)';
   },
 };
 
@@ -1561,6 +2148,21 @@ function drawMonster(m, t) {
   let alpha = 1;
   if (m.dead) { const k = clamp(m.deathT / 0.35, 0, 1); sx *= 1 + k * 0.3; sy *= 1 - k * 0.6; alpha = 1 - k; }
   const scale = 0.4 + 0.6 * born;
+  if (!motionLow()) y -= (1 - born) * (1 - born) * r * (m.boss ? 2.2 : 1.2);   // cai do alto ao entrar
+  if (m.ancient && !m.dead) {
+    ctx.save(); ctx.translate(c.x, scene.ground() - 2); ctx.scale(1, 0.32); ctx.rotate(motionLow() ? 0 : t * 0.6);
+    ctx.strokeStyle = `rgba(197,139,255,${0.55 * born})`; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, 0, r * 1.25, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, r * 1.05, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = `rgba(230,200,255,${0.8 * born})`;
+    for (let j = 0; j < 12; j++) { ctx.rotate(Math.PI / 6); ctx.fillRect(r * 1.1, -2, 10, 4); ctx.fillRect(r * 1.13, -7, 3, 14); }
+    ctx.restore();
+  }
+  if (m.chest && !m.dead) {
+    const g = ctx.createRadialGradient(c.x, c.y, r * 0.2, c.x, c.y, r * 1.6);
+    g.addColorStop(0, `rgba(255,214,90,${0.35 + Math.sin(t * 5) * 0.1})`); g.addColorStop(1, 'rgba(255,214,90,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, r * 1.6, 0, Math.PI * 2); ctx.fill();
+    if (S.settings.particles && Math.random() < 0.15) parts.push({ x: c.x + (Math.random() - 0.5) * r * 1.4, y: c.y - r * 0.6, vx: 0, vy: -40, t: 0, life: 0.7, color: '#ffe08a', size: 3, g: 0 });
+  }
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.fillStyle = 'rgba(0,0,0,0.28)';
@@ -1608,6 +2210,7 @@ function drawMonster(m, t) {
   bg.addColorStop(0, light); bg.addColorStop(1, dark);
   ctx.fillStyle = bg; ctx.fill(body);
   ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.stroke(body);
+  if (m.shiny) { ctx.lineWidth = 3; ctx.strokeStyle = `hsl(${(t * 120) % 360},90%,75%)`; ctx.stroke(body); if (S.settings.particles && Math.random() < 0.2) fx.spark(x + (Math.random() - 0.5) * r, y - r * 0.5, '#fff3a8', 0.4); }
   if (m.spikes) {
     ctx.fillStyle = dark;
     for (let i = -2; i <= 2; i++) {
@@ -1671,7 +2274,7 @@ function drawChest(m, r, t) {
 }
 
 // Desenha o herói na origem (pés em y = 0, unidades do herói). eq = equipamentos que definem a skin.
-function drawHeroFigure(c, t, atkK, fury, eq) {
+function drawHeroFigure(c, t, atkK, fury, eq, raise = 0) {
   const bob = Math.sin(t * 4) * 2;
   const A = eq.armor, Hh = eq.hat, Sw = eq.sword, Rg = eq.ring;
   const rcol = it => RARITIES[it.rar].color;
@@ -1757,7 +2360,8 @@ function drawHeroFigure(c, t, atkK, fury, eq) {
   // espada
   const R0 = Sw ? RARITIES[Sw.rar] : RARITIES[0];
   const model = Sw ? Sw.model : 0;
-  const ang = atkK > 0 ? lerp(-1.2, 1.1, atkK) : -0.5 + Math.sin(t * 2) * 0.05;
+  let ang = atkK > 0 ? lerp(-1.2, 1.1, atkK) : -0.5 + Math.sin(t * 2) * 0.05;
+  if (raise > 0) ang = lerp(ang, -2.6, raise);                      // vitória: espada erguida
   c.save(); c.translate(12, -52 + bob); c.rotate(ang);
   if (Sw && Sw.rar >= 3) { c.shadowColor = R0.color; c.shadowBlur = 10 + Math.sin(t * 6) * 4; }
   const blade = c.createLinearGradient(0, -66, 0, -6);
@@ -1793,12 +2397,15 @@ function drawHeroFigure(c, t, atkK, fury, eq) {
 
 function drawHero(t) {
   const p = scene.heroPos();
-  const s = scene.unit() * 0.7;
+  const s = scene.unit() * 0.85;
   const lunge = hero.atk > 0 ? Math.sin((hero.atk / 0.14) * Math.PI) * 18 * s : 0;
+  const jump = hero.win > 0 && !motionLow() ? Math.abs(Math.sin(hero.win * 6)) * 10 * s : 0;
+  const back = hero.hurt > 0 ? -Math.sin(hero.hurt / 0.8 * Math.PI) * 14 * s : 0;
   ctx.save();
-  ctx.translate(p.x + lunge, p.y);
+  if (hero.hurt > 0 && Math.floor(hero.hurt * 12) % 2) ctx.globalAlpha = 0.55;
+  ctx.translate(p.x + lunge + back, p.y - jump);
   ctx.scale(s, s);
-  drawHeroFigure(ctx, t, hero.atk > 0 ? 1 - hero.atk / 0.14 : 0, skillActive(1), S.equip);
+  drawHeroFigure(ctx, t, hero.atk > 0 ? 1 - hero.atk / 0.14 : 0, skillActive(1), S.equip, hero.win > 0 && hero.atk <= 0 ? Math.min(1, hero.win * 3) : 0);
   ctx.restore();
   const Sw = S.equip.sword;
   if (Sw && Sw.model === 4 && S.settings.particles && Math.random() < 0.25) {
@@ -1941,12 +2548,7 @@ function render(t, dt) {
   let ox = 0, oy = 0;
   if (shakeT > 0) { ox = (Math.random() - 0.5) * shakeA; oy = (Math.random() - 0.5) * shakeA; }
   if (bgCanvas) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(bgCanvas, ox * DPR, oy * DPR); ctx.setTransform(DPR, 0, 0, DPR, ox * DPR, oy * DPR); }
-  ctx.fillStyle = 'rgba(255,230,180,0.35)';
-  for (let i = 0; i < 14; i++) {
-    const x = ((i * 97 + t * (8 + i)) % (W + 20)) - 10;
-    const y = (H * 0.7 - ((t * (10 + i * 2) + i * 53) % (H * 0.7)));
-    ctx.fillRect(x, y, 2, 2);
-  }
+  drawAmbient(t);
   // nuvens em parallax
   ctx.fillStyle = 'rgba(255,255,255,0.07)';
   for (let i = 0; i < 4; i++) {
@@ -1982,6 +2584,7 @@ function render(t, dt) {
     ctx.beginPath(); b.pts.forEach(([x, y], j) => j ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke();
     ctx.shadowBlur = 0;
   }
+  drawRingsBeams(dt);
   drawWisp(t);
   for (let i = parts.length - 1; i >= 0; i--) {
     const p = parts[i]; p.t += dt;
@@ -2023,7 +2626,9 @@ function render(t, dt) {
     ctx.fillText(txt, W * 0.5, Math.max(y, 80));
     ctx.globalAlpha = 1;
   }
-  if (flashT > 0) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = `rgba(220,245,255,${flashT})`; ctx.fillRect(0, 0, cv.width, cv.height); }
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawMoments(dt);
+  if (flashT > 0 && !motionLow()) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = flashCol.replace('A', flashT); ctx.fillRect(0, 0, cv.width, cv.height); }
   if (skillActive(2)) {
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.fillStyle = 'rgba(255,201,74,0.6)';
@@ -2069,6 +2674,16 @@ function buildTabs() {
     + `<button id="panelToggle" aria-label="Recolher ou expandir o painel">${ICON.chevron}</button>`;
   $('#qty').innerHTML = [1, 10, 100, 'max'].map(q => `<button data-qty="${q}" class="${S.settings.buyQty === q ? 'on' : ''}">${q === 'max' ? 'MÁX' : 'x' + q}</button>`).join('');
   $('#panel').classList.toggle('collapsed', !!S.settings.panelCollapsed);
+}
+function syncMute() {
+  const b = $('#btnMute'); if (!b) return;
+  const off = !S.settings.sound;
+  b.classList.toggle('off', off); b.setAttribute('aria-pressed', String(off));
+  b.setAttribute('aria-label', off ? 'Ligar o som' : 'Silenciar');
+}
+function applyA11y() {
+  document.documentElement.classList.toggle('bigText', !!S.settings.bigText);
+  document.documentElement.classList.toggle('lowMotion', motionLow());
 }
 function setPanelCollapsed(v) {
   S.settings.panelCollapsed = v;
@@ -2297,9 +2912,10 @@ function tabBadges() {
   document.querySelectorAll('#tabs [data-tab]').forEach(b => b.classList.toggle('has', !!can[b.dataset.tab]));
 }
 
+const SKILL_SHORT = ['Raio', 'Fúria', 'Ouro', 'Grito'];
 function buildSkillBar() {
   $('#skills').innerHTML = SKILLS.map((s, i) => `<button class="skill" data-skill="${i}" aria-label="${s.name}">
-      <span class="cd"></span><span class="cdTxt"></span>${ICON['s' + i]}<small>${s.mana}</small></button>`).join('');
+      <span class="cd"></span><span class="cdTxt"></span>${ICON['s' + i]}<span class="nm">${SKILL_SHORT[i]}<kbd>${i + 1}</kbd></span><small>${s.mana} mana</small></button>`).join('');
 }
 
 function updateHUD() {
@@ -2362,33 +2978,203 @@ function toast(msg, kind = '') {
 }
 
 /* ---------- janelas ---------- */
-function openModal(html, onMount) {
+let modalLocked = false;
+function openModal(html, onMount, opts) {
   const sh = $('#sheet');
   sh.innerHTML = html;
+  modalLocked = !!(opts && opts.locked);       // janelas de recuperação não fecham por fora
   $('#modal').hidden = false;
   sh.scrollTop = 0;
   if (onMount) onMount(sh);
 }
-function closeModal() {
+function closeModal(force) {
+  if (modalLocked && force !== true) return;
+  modalLocked = false;
   $('#modal').hidden = true; $('#sheet').innerHTML = '';
-  if (!dailyPrompted && dailyState().available) setTimeout(() => { if ($('#modal').hidden) openDaily(); }, 350);
+  if (!saveBlock && !dailyPrompted && dailyState().available) setTimeout(() => { if ($('#modal').hidden) openDaily(); }, 350);
 }
+function forceClose() { closeModal(true); }
+
+const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function fmtDate(ms) {
+  if (!(ms > 0)) return '—';
+  try { return new Date(ms).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }); } catch (e) { return new Date(ms).toISOString(); }
+}
+function summaryCard(title, x) {
+  return `<div class="card sumCard"><h3 class="gold">${esc(title)}</h3><dl class="stats">
+    <dt>Estágio atual / máximo</dt><dd>${fmt(x.stage)} / ${fmt(x.maxStage)}</dd>
+    <dt>Herói</dt><dd>Nv ${fmt(x.hero)}</dd>
+    <dt>Ouro</dt><dd>${fmt(x.gold)}</dd>
+    <dt>Essências (total ganho)</dt><dd>${fmt(x.ess)} (${fmt(x.essTotal)})</dd>
+    <dt>Aliados · itens</dt><dd>${x.allies} · ${x.items}</dd>
+    <dt>Renascimentos</dt><dd>${fmt(x.prestiges)}</dd>
+    <dt>Salvo em</dt><dd>${esc(fmtDate(x.lastSave))}</dd></dl></div>`;
+}
+function downloadText(name, text) {
+  try {
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return true;
+  } catch (e) { return false; }
+}
+// Todos os dados brutos do jogo neste navegador, como estão (inclusive os ilegíveis), para guardar ou pedir ajuda.
+function rawDump() {
+  const out = { exportedAt: new Date().toISOString(), game: 'Lâmina Rúnica', saveVersion: VERSION, keys: {} };
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('laminaRunica.')) out.keys[k] = localStorage.getItem(k);
+    }
+  } catch (e) {}
+  return JSON.stringify(out, null, 1);
+}
+function stamp() { const d = new Date(); return `${todayKey(d)}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`; }
+
+/* ---------- recuperação ---------- */
+const SOURCE_NAME = { backup: 'Backup recente', snap0: 'Cópia rotativa 1', snap1: 'Cópia rotativa 2', snap2: 'Cópia rotativa 3' };
+function openRecovery(info) {
+  saveBlock = 'recover';
+  const why = info.mainError === 'missing'
+    ? 'O salvamento principal não foi encontrado, mas existem cópias de segurança neste navegador.'
+    : `O salvamento principal não pôde ser lido (${esc(SAVE_ERRORS[info.mainError] || info.mainError)}). Ele <b>não foi apagado</b>.`;
+  const list = info.candidates.map((c, i) => `${summaryCard(SOURCE_NAME[c.source] || c.source, saveSummary(c.res.state))}
+      <div class="btns"><button class="btn primary" data-cand="${i}">Carregar esta cópia</button></div>`).join('');
+  openModal(`<h2>Recuperar progresso</h2>
+    <p>${why} Nada será gravado até você escolher uma opção.</p>
+    ${info.candidates.length ? list : '<p><b>Nenhuma cópia legível foi encontrada.</b> Exporte os dados brutos para guardar o que existe.</p>'}
+    <div class="btns"><button class="btn" id="dumpBtn">Exportar dados brutos (.txt)</button></div>
+    <div class="sectionLabel">Última opção</div>
+    <div class="btns"><button class="btn danger" id="newGame">Começar um novo jogo</button></div>
+    <p class="muted">Começar de novo guarda uma cópia do salvamento ilegível neste navegador; ela continua disponível em “Exportar dados brutos”.</p>`,
+    sh => {
+      sh.querySelectorAll('[data-cand]').forEach(b => b.addEventListener('click', () => {
+        const c = info.candidates[+b.dataset.cand];
+        if (info.mainText && Store.get(CORRUPT_KEY) !== info.mainText) Store.set(CORRUPT_KEY, info.mainText);
+        Session.knownRev = Math.max(Session.knownRev, c.res.meta.rev || 0);
+        saveBlock = '';
+        forceClose();
+        applyState(c.res.state, { snapshot: true });
+        toast('Cópia carregada. O progresso voltou a ser salvo.', 'gold');
+      }));
+      sh.querySelector('#dumpBtn').addEventListener('click', () => {
+        if (!downloadText(`lamina-runica-dados-${stamp()}.txt`, rawDump())) toast('O navegador bloqueou o download.', 'bad');
+      });
+      const nb = sh.querySelector('#newGame');
+      nb.addEventListener('click', () => {
+        if (!nb.classList.contains('armed')) { nb.classList.add('armed'); nb.textContent = 'Toque de novo para confirmar o novo jogo'; return; }
+        if (info.mainText && Store.get(CORRUPT_KEY) !== info.mainText) Store.set(CORRUPT_KEY, info.mainText);
+        if (info.candidates[0]) writeSafety('recover', info.candidates[0].text);
+        saveBlock = '';
+        forceClose();
+        applyState(defaults(), {});
+        toast('Novo jogo iniciado. As cópias anteriores continuam em “Exportar dados brutos”.');
+      });
+    }, { locked: true });
+}
+function openFuture(info) {
+  saveBlock = 'future';
+  openModal(`<h2>Progresso de uma versão mais nova</h2>
+    <p>O salvamento deste navegador foi criado por uma versão mais nova do Lâmina Rúnica (save v${esc(info.main.v)}; esta página entende até v${VERSION}).
+    Para não estragá-lo, esta página <b>não vai gravar nada</b>.</p>
+    <p>Provavelmente o navegador abriu uma cópia antiga em cache. Recarregue a página para abrir a versão atual.</p>
+    <div class="btns"><button class="btn primary" id="reloadBtn">Recarregar</button><button class="btn" id="dumpBtn">Exportar dados brutos (.txt)</button></div>`,
+    sh => {
+      sh.querySelector('#reloadBtn').addEventListener('click', () => location.reload());
+      sh.querySelector('#dumpBtn').addEventListener('click', () => downloadText(`lamina-runica-dados-${stamp()}.txt`, rawDump()));
+    }, { locked: true });
+}
+function enterConflict() {
+  if (saveBlock === 'conflict') return;
+  saveBlock = 'conflict';
+  paused = true;
+  openModal(`<h2>Jogo aberto em outra aba</h2>
+    <p>O Lâmina Rúnica foi salvo por outra aba ou janela deste navegador com um progresso mais recente.
+    Esta aba foi <b>pausada</b> para não apagar esse progresso.</p>
+    <div class="btns"><button class="btn primary" id="reloadBtn">Continuar aqui (carrega o progresso mais recente)</button></div>
+    <p class="muted">Feche as outras abas do jogo antes, para que só uma continue salvando.</p>`,
+    sh => sh.querySelector('#reloadBtn').addEventListener('click', () => location.reload()), { locked: true });
+}
+function openSaveProblem() {
+  openModal(`<h2>O progresso não está sendo salvo</h2>
+    <p>${esc(SAVE_FAIL_TXT[lastSaveError] || SAVE_FAIL_TXT.error)}</p>
+    <p>Enquanto isso, guarde um código de backup para não perder o que já conquistou.</p>
+    <div class="btns"><button class="btn primary" id="retrySave">Tentar salvar de novo</button><button class="btn" id="dlCode">Baixar código de backup</button><button class="btn" data-close>Fechar</button></div>`,
+    sh => {
+      sh.querySelector('#retrySave').addEventListener('click', () => { if (save({ manual: true })) closeModal(); });
+      sh.querySelector('#dlCode').addEventListener('click', () => { if (!downloadText(`lamina-runica-backup-${stamp()}.txt`, exportCode())) toast('O navegador bloqueou o download.', 'bad'); });
+    });
+}
+
+/* ---------- importação (em memória → resumo → confirmação → cópia de segurança → aplica tudo ou nada) ---------- */
+function tryImport(text) {
+  const r = importCodeChecked(text);
+  if (!r.ok) { toast(IMPORT_ERRORS[r.error] || 'Código inválido.', 'bad'); return; }
+  const s = r.state;
+  openModal(`<h2>Carregar este progresso?</h2>
+    <p>O progresso atual será substituído. Antes disso, uma cópia dele fica guardada e pode ser restaurada nas Configurações.</p>
+    ${summaryCard('Progresso atual', saveSummary(S))}${summaryCard('Código importado', saveSummary(s))}
+    ${r.fixes.length ? `<p class="muted">Alguns valores fora do intervalo permitido foram ajustados (${esc(r.fixes.join(', '))}).</p>` : ''}
+    <div class="btns"><button class="btn primary" id="okImp">Carregar</button><button class="btn" data-close>Cancelar</button></div>`,
+    sh => {
+      const ok = sh.querySelector('#okImp');
+      ok.addEventListener('click', () => {
+        if (ok.disabled) return; ok.disabled = true;             // clique duplo não importa duas vezes
+        if (Store.backend && !writeSafety('import', serialize())) { toast('Não foi possível guardar a cópia do progresso atual. Importação cancelada.', 'bad'); ok.disabled = false; return; }
+        const prev = S;
+        if (!applyState(s, { snapshot: true }) && Store.backend) {
+          applyState(prev, {});                                  // tudo ou nada
+          toast('Não foi possível gravar o progresso importado. Nada foi alterado.', 'bad');
+          closeModal(); return;
+        }
+        cloudSave(); closeModal();
+        toast('Progresso carregado!', 'gold');
+      });
+    });
+}
+function restoreSafety(reason, label) {
+  const o = readSafety(reason);
+  const r = o ? decodeSave(o.save) : null;
+  if (!r || !r.ok) { toast('Essa cópia não está legível.', 'bad'); return; }
+  openModal(`<h2>Restaurar ${esc(label)}?</h2>
+    <p>Cópia guardada em ${esc(fmtDate(o.at))}. O progresso atual também fica guardado, então a troca pode ser desfeita.</p>
+    ${summaryCard('Progresso atual', saveSummary(S))}${summaryCard('Cópia guardada', saveSummary(r.state))}
+    <div class="btns"><button class="btn primary" id="okRes">Restaurar</button><button class="btn" data-close>Cancelar</button></div>`,
+    sh => {
+      const ok = sh.querySelector('#okRes');
+      ok.addEventListener('click', () => {
+        if (ok.disabled) return; ok.disabled = true;
+        const cur = serialize();
+        applyState(r.state, { snapshot: true });
+        writeSafety(reason, cur);
+        cloudSave(); closeModal(); toast('Cópia restaurada.', 'gold');
+      });
+    });
+}
+const SAFETY_LABELS = { import: 'progresso de antes da última importação', reset: 'progresso apagado', cloud: 'progresso deste aparelho de antes da nuvem', cloudRemote: 'cópia da nuvem não usada', repair: 'save original antes das correções automáticas', recover: 'melhor cópia de antes do novo jogo' };
 
 function openSettings() {
   const st = S.settings;
   const sw = (id, label, hint) => `<div class="setRow"><label for="${id}">${label}${hint ? `<small>${hint}</small>` : ''}</label><input type="checkbox" class="switch" id="${id}" ${st[id] ? 'checked' : ''}></div>`;
+  const range = (id, label, v) => `<div class="setRow"><label for="${id}">${label}</label><input type="range" id="${id}" min="0" max="1" step="0.05" value="${v}"></div>`;
+  const safeties = Object.keys(SAFETY_LABELS).map(k => [k, readSafety(k)]).filter(([, o]) => o);
   openModal(`
     <h2>Configurações</h2>
     <div class="sectionLabel">Som e toque</div>
-    ${sw('sound', 'Sons')}
+    ${sw('sound', 'Sons', 'Liga ou desliga todo o áudio (também pelo alto-falante no topo)')}
+    ${range('volume', 'Volume dos efeitos', st.volume)}
     ${sw('music', 'Música de fundo')}
-    <div class="setRow"><label for="volume">Volume</label><input type="range" id="volume" min="0" max="1" step="0.05" value="${st.volume}"></div>
+    ${range('musicVol', 'Volume da música', st.musicVol)}
+    <p class="muted" id="audioState"></p>
     ${sw('vibrate', 'Vibração', 'Funciona em celulares compatíveis')}
-    <div class="sectionLabel">Tela</div>
-    <div class="setRow"><label>Tela cheia<small>Esconde a barra do navegador, quando ele permite</small></label><button class="btn" id="fsBtn">Ativar</button></div>
+    <div class="sectionLabel">Tela e acessibilidade</div>
+    <div class="setRow"><label>Tela cheia<small>Esconde a barra do navegador, quando ele permite</small></label><button class="btn" id="fsBtn">Ativar / sair</button></div>
     ${sw('panelCollapsed', 'Painel recolhido', 'Deixa a área de batalha maior. Também pela seta ao lado das abas')}
+    ${sw('bigText', 'Texto maior', 'Aumenta os textos e botões do painel')}
+    ${sw('reduceMotion', 'Reduzir movimento', reducedMotionOS ? 'Seu sistema já pede menos movimento' : 'Menos tremor, flashes e animações de fundo')}
     ${sw('dmgNums', 'Números de dano')}
-    ${sw('particles', 'Partículas')}
+    ${sw('particles', 'Partículas', 'Desligue em aparelhos mais lentos')}
     ${sw('shake', 'Tremor de tela')}
     <div class="setRow"><label for="notation">Números grandes<small>1,5M ou 1,50e6</small></label>
       <select id="notation"><option value="letters" ${st.notation === 'letters' ? 'selected' : ''}>Letras (K, M, B…)</option><option value="sci" ${st.notation === 'sci' ? 'selected' : ''}>Científica</option></select></div>
@@ -2402,42 +3188,55 @@ function openSettings() {
     <p class="muted" id="cloudTxt"></p>
     <div class="btns"><button class="btn primary" id="saveNow">Salvar agora</button></div>
     <div class="sectionLabel">Backup do progresso</div>
-    <p class="muted">Copie o código para guardar seu progresso ou levá-lo para outro aparelho. Cole um código abaixo para carregar.</p>
-    <textarea id="codeBox" placeholder="Cole aqui um código LR1… para importar" spellcheck="false"></textarea>
+    <p class="muted">O progresso fica salvo só neste navegador e neste endereço do jogo. Compartilhar o link do jogo <b>não</b> envia o seu progresso. Para levá-lo a outro aparelho ou navegador, use o código abaixo.</p>
+    <textarea id="codeBox" placeholder="Cole aqui um código LR1… para importar" spellcheck="false" aria-label="Código de backup"></textarea>
     <div class="btns">
       <button class="btn" id="exportBtn">Gerar e copiar código</button>
+      <button class="btn" id="dlBtn">Baixar arquivo</button>
       <button class="btn" id="importBtn">Carregar código</button>
       <label class="btn fileLbl">Abrir arquivo<input type="file" id="fileIn" accept=".txt,text/plain"></label>
     </div>
+    ${safeties.length ? `<div class="sectionLabel">Cópias de segurança guardadas</div>
+      ${safeties.map(([k, o]) => `<div class="setRow"><label>${esc(SAFETY_LABELS[k][0].toUpperCase() + SAFETY_LABELS[k].slice(1))}<small>${esc(fmtDate(o.at))}</small></label><button class="btn" data-restore="${k}">Restaurar</button></div>`).join('')}` : ''}
     <div class="sectionLabel">Zona de perigo</div>
     <div class="btns"><button class="btn danger" id="resetBtn">Apagar todo o progresso</button></div>
-    <p class="muted">Lâmina Rúnica · versão de salvamento ${VERSION}</p>
+    <p class="muted">Ao apagar, uma cópia do progresso atual fica guardada nesta tela e pode ser restaurada.</p>
+    <p class="muted">Lâmina Rúnica · versão de salvamento ${VERSION} · revisão ${Session.knownRev}</p>
     <div class="btns"><button class="btn primary" data-close>Fechar</button></div>
   `, sh => {
     const upd = () => {
       const s = $('#lastSaveTxt'); if (!s) return;
-      s.textContent = `Último: há ${Math.max(0, Math.floor((Date.now() - S.lastSave) / 1000))} s${storageOk ? '' : ' (bloqueado neste navegador)'}`;
+      s.textContent = storageOk
+        ? `Último: há ${Math.max(0, Math.floor((Date.now() - S.lastSave) / 1000))} s`
+        : 'Não está salvando: veja o aviso ⚠ no topo';
       $('#cloudTxt').innerHTML = cloud.ok
         ? `<span class="cloudOn">Nuvem ativa</span>: seu progresso também fica salvo na sua conta${cloud.at ? ` (há ${Math.max(0, Math.floor((Date.now() - cloud.at) / 1000))} s)` : ''}.`
-        : 'O progresso fica salvo neste navegador. Para levar a outro aparelho, use o código de backup abaixo.';
+        : '';
+      const as = $('#audioState');
+      if (as) as.textContent = !st.sound ? '' : !AC ? 'O som começa depois do primeiro toque na tela.' : AC.state !== 'running' ? 'O navegador bloqueou o áudio. Toque na tela para liberar.' : '';
     };
     upd(); const iv = setInterval(() => { if ($('#modal').hidden || !$('#lastSaveTxt')) clearInterval(iv); else upd(); }, 1000);
     ['sound', 'music', 'vibrate', 'dmgNums', 'particles', 'shake', 'autoBoss', 'offlineModal'].forEach(id => {
-      sh.querySelector('#' + id).addEventListener('change', e => { st[id] = e.target.checked; save(); });
+      sh.querySelector('#' + id).addEventListener('change', e => { st[id] = e.target.checked; if (id === 'sound') syncMute(); save(); });
     });
+    sh.querySelector('#bigText').addEventListener('change', e => { st.bigText = e.target.checked; applyA11y(); save(); });
+    sh.querySelector('#reduceMotion').addEventListener('change', e => { st.reduceMotion = e.target.checked; applyA11y(); save(); });
     sh.querySelector('#panelCollapsed').addEventListener('change', e => setPanelCollapsed(e.target.checked));
     sh.querySelector('#fsBtn').addEventListener('click', () => {
       const el = document.documentElement;
+      if (document.fullscreenElement && document.exitFullscreen) { document.exitFullscreen().catch(() => {}); return; }
       const req = el.requestFullscreen || el.webkitRequestFullscreen;
       if (!req) { toast('Este navegador não permite tela cheia aqui.', 'bad'); return; }
       try { const p = req.call(el); if (p && p.catch) p.catch(() => toast('Este navegador não permite tela cheia aqui.', 'bad')); } catch (e) { toast('Este navegador não permite tela cheia aqui.', 'bad'); }
     });
     sh.querySelector('#volume').addEventListener('input', e => { st.volume = +e.target.value; });
     sh.querySelector('#volume').addEventListener('change', () => { SFX.coin(); save(); });
+    sh.querySelector('#musicVol').addEventListener('input', e => { st.musicVol = +e.target.value; });
+    sh.querySelector('#musicVol').addEventListener('change', () => save());
     sh.querySelector('#notation').addEventListener('change', e => { st.notation = e.target.value; uiDirty = true; save(); });
     sh.querySelector('#autosave').addEventListener('change', e => { st.autosave = +e.target.value; save(); });
     sh.querySelector('#autoSalvage').addEventListener('change', e => { st.autoSalvage = +e.target.value; save(); });
-    sh.querySelector('#saveNow').addEventListener('click', () => { save(true); upd(); });
+    sh.querySelector('#saveNow').addEventListener('click', () => { save({ manual: true, snapshot: true }); upd(); });
     const box = sh.querySelector('#codeBox');
     sh.querySelector('#exportBtn').addEventListener('click', () => {
       save();
@@ -2447,19 +3246,17 @@ function openSettings() {
       const fallback = () => { box.focus(); box.select(); toast('Selecione e copie o código na caixa.'); };
       try { navigator.clipboard.writeText(code).then(done, fallback); } catch (e) { fallback(); }
     });
-    const tryImport = text => {
-      const s = importCode(text);
-      if (!s) { toast('Código inválido ou incompleto.', 'bad'); return; }
-      openModal(`<h2>Carregar este progresso?</h2>
-        <p>Estágio máximo <b>${s.maxStage}</b>, ${s.essTotal} essências. O progresso atual será substituído.</p>
-        <div class="btns"><button class="btn primary" id="okImp">Carregar</button><button class="btn" data-close>Cancelar</button></div>`,
-        sh2 => sh2.querySelector('#okImp').addEventListener('click', () => { applyState(s); cloudSave(); closeModal(); toast('Progresso carregado!', 'gold'); }));
-    };
+    sh.querySelector('#dlBtn').addEventListener('click', () => {
+      save();
+      if (!downloadText(`lamina-runica-backup-${stamp()}.txt`, exportCode())) toast('O navegador bloqueou o download. Use “Gerar e copiar código”.', 'bad');
+    });
     sh.querySelector('#importBtn').addEventListener('click', () => tryImport(box.value));
     sh.querySelector('#fileIn').addEventListener('change', e => {
       const f = e.target.files && e.target.files[0]; if (!f) return;
-      const rd = new FileReader(); rd.onload = () => tryImport(String(rd.result)); rd.readAsText(f);
+      if (f.size > MAX_CODE_CHARS) { toast(IMPORT_ERRORS.too_big, 'bad'); return; }
+      const rd = new FileReader(); rd.onload = () => tryImport(String(rd.result)); rd.onerror = () => toast('Não foi possível ler o arquivo.', 'bad'); rd.readAsText(f);
     });
+    sh.querySelectorAll('[data-restore]').forEach(b => b.addEventListener('click', () => restoreSafety(b.dataset.restore, SAFETY_LABELS[b.dataset.restore])));
     const rb = sh.querySelector('#resetBtn');
     rb.addEventListener('click', () => {
       if (!rb.classList.contains('armed')) {
@@ -2467,9 +3264,11 @@ function openSettings() {
         setTimeout(() => { rb.classList.remove('armed'); rb.textContent = 'Apagar todo o progresso'; }, 4000);
         return;
       }
-      storeDel(SAVE_KEY); storeDel(BACKUP_KEY);
+      if (Store.backend && !writeSafety('reset', serialize())) { toast('Não foi possível guardar uma cópia antes de apagar. Nada foi apagado.', 'bad'); return; }
+      Store.del(SAVE_KEY); Store.del(BACKUP_KEY);
+      for (let i = 0; i < SNAP_COUNT; i++) Store.del(SNAP_KEY + i);
       dailyPrompted = true;
-      applyState(defaults()); cloudSave(); closeModal(); toast('Progresso apagado. Boa nova jornada!');
+      applyState(defaults(), {}); cloudSave(); closeModal(); toast('Progresso apagado. Uma cópia ficou guardada nas Configurações.');
     });
   });
 }
@@ -2487,13 +3286,15 @@ function openPrestige() {
     sh => sh.querySelector('#okPrestige').addEventListener('click', prestige));
 }
 
-function applyState(s) {
+// Troca o estado inteiro (importar, recuperar, apagar). Retorna se a gravação deu certo.
+function applyState(s, opts) {
   S = s;
   foe = null; spawnDelay = 0.2; wisp = null;
   parts.length = nums.length = slashes.length = projs.length = 0;
   buildTabs(); structDirty = true; uiDirty = true;
+  applyA11y(); syncMute();
   scene.zoneChanged();
-  save();
+  return save(opts || {});
 }
 
 /* ---------- eventos ---------- */
@@ -2528,9 +3329,10 @@ function bindEvents() {
     if (e.code === 'Space' || e.code === 'Enter') {
       if (document.activeElement && document.activeElement.tagName === 'BUTTON') return;
       e.preventDefault();
+      if (e.repeat) return;                 // segurar a tecla não conta como vários toques
       const m = scene.monster();
       doTap(m.x + (Math.random() - 0.5) * m.r, m.y + (Math.random() - 0.5) * m.r, false);
-    } else if (/^Digit[1-4]$/.test(e.code)) useSkill(+e.code.slice(5) - 1);
+    } else if (/^(Digit|Numpad)[1-4]$/.test(e.code) && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey) useSkill(+e.code.slice(-1) - 1);
   });
   $('#tabs').addEventListener('click', e => {
     if (e.target.closest('#panelToggle')) { setPanelCollapsed(!S.settings.panelCollapsed); return; }
@@ -2545,7 +3347,7 @@ function bindEvents() {
     const b = e.target.closest('[data-qty]'); if (!b) return;
     S.settings.buyQty = b.dataset.qty === 'max' ? 'max' : +b.dataset.qty;
     document.querySelectorAll('#qty button').forEach(x => x.classList.toggle('on', x === b));
-    uiDirty = true;
+    uiDirty = true; saveSoon();
   });
 
   // compra com clique, ou segurando o botão para repetir
@@ -2593,6 +3395,8 @@ function bindEvents() {
     if (e.target.id === 'modal' || e.target.closest('[data-close]')) closeModal();
   });
   window.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) closeModal(); });
+  $('#btnMute').addEventListener('click', () => { S.settings.sound = !S.settings.sound; if (S.settings.sound) audioInit(); syncMute(); save(); toast(S.settings.sound ? 'Som ligado.' : 'Som desligado.'); });
+  $('#saveWarn').addEventListener('click', openSaveProblem);
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { save(); cloudSave(); }
@@ -2600,6 +3404,13 @@ function bindEvents() {
   });
   window.addEventListener('pagehide', () => save());
   window.addEventListener('beforeunload', () => save());
+  // Outra aba gravou uma revisão mais nova: esta aba para de salvar na hora, em vez de esperar o próximo autosave.
+  window.addEventListener('storage', e => {
+    if (e.key !== SAVE_KEY || saveBlock) return;
+    if (e.newValue === null) { enterConflict(); return; }
+    const m = peekSave(e.newValue);
+    if (m.valid && m.tab && m.tab !== Session.tab && m.rev > Session.knownRev) enterConflict();
+  });
 
   if ('ResizeObserver' in window) new ResizeObserver(() => scene.resize()).observe(cv);
   else window.addEventListener('resize', () => scene.resize());
@@ -2609,7 +3420,7 @@ function bindEvents() {
    LOOP PRINCIPAL
    ========================================================= */
 let lastTick = performance.now();
-let uiTimer = 0, furyAcc = 0;
+let uiTimer = 0, furyAcc = 0, paused = false;
 let wallLast = Date.now();
 
 function step(dt) {
@@ -2620,6 +3431,8 @@ function step(dt) {
   combo.t += dt;
   if (combo.t > 0.6 && combo.n) combo.n = 0;
   if (hero.atk > 0) hero.atk -= dt;
+  if (hero.win > 0) hero.win -= dt;
+  if (hero.hurt > 0) hero.hurt -= dt;
   if (shakeT > 0) { shakeT -= dt; if (shakeT <= 0) shakeA = 0; }
   if (flashT > 0) flashT = Math.max(0, flashT - dt);
 
@@ -2663,11 +3476,11 @@ function frame(now) {
   // compensa o tempo em que a aba ficou em segundo plano (o navegador pausa a animação)
   const wnow = Date.now(), gap = (wnow - wallLast) / 1000;
   wallLast = wnow;
-  if (gap > 5) offlineGains(gap, gap >= 60);
+  if (gap > 5 && !paused) { offlineGains(gap, gap >= 60); save(); }
   if (dt > 1) dt = 1;
   if (dt < 0) dt = 0;
-  step(dt);
-  if (zoneOf(S.stage).name !== scene.zoneKey) scene.zoneChanged();
+  if (!paused) step(dt);
+  if (S.stage !== scene.stageKey) scene.zoneChanged();
   render(now / 1000, dt);
 
   uiTimer -= dt;
@@ -2681,8 +3494,8 @@ function frame(now) {
   if (tab === 'itens' && !S.settings.panelCollapsed) drawPreview(now / 1000);
   if (foe && $('#foeName').dataset.seed !== String(foe.seed)) { $('#foeName').dataset.seed = foe.seed; updateFoeUI(true); }
 
-  if ((now - lastSaveAt) / 1000 >= S.settings.autosave) save();
-  if (cloud.ok && now - cloud.last > 30000) cloudSave();
+  if (!saveBlock && (now - lastSaveAt) / 1000 >= S.settings.autosave) save();
+  if (cloud.ok && !saveBlock && now - cloud.last > 30000) cloudSave();
   requestAnimationFrame(frame);
 }
 
@@ -2690,21 +3503,54 @@ function frame(now) {
    INÍCIO
    ========================================================= */
 function start(hotData) {
-  let loaded = null;
-  if (hotData && hotData.save) loaded = parseSave(hotData.save);
-  const fresh = !loaded && !(loaded = loadSave());
-  if (loaded) S = loaded;
+  Store.init();
+  let fresh = false, hot = false, pending = null;
+  const hr = hotData && hotData.save ? decodeSave(hotData.save) : null;
+  if (hr && hr.ok) { S = hr.state; Session.knownRev = hr.meta.rev || 0; hot = true; }
+  else {
+    const L = chooseLoad();
+    if (L.kind === 'ok' || L.kind === 'backup') {
+      S = L.res.state; Session.knownRev = L.res.meta.rev || 0;
+      if (L.kind === 'backup') {
+        if (Store.get(CORRUPT_KEY) !== L.mainText) Store.set(CORRUPT_KEY, L.mainText);
+        const pm = peekSave(L.mainText);
+        if (pm.rev) Session.knownRev = Math.max(Session.knownRev, pm.rev);
+        pending = () => openModal(`<h2>Progresso recuperado</h2>
+          <p>O salvamento principal não pôde ser lido (${esc(SAVE_ERRORS[L.mainError] || L.mainError)}), então o <b>backup</b> mais recente foi carregado.
+          Uma cópia do salvamento danificado foi guardada neste navegador e pode ser exportada.</p>
+          ${summaryCard('Backup carregado', saveSummary(S))}
+          <div class="btns"><button class="btn primary" data-close>Continuar</button><button class="btn" id="dumpBtn">Exportar dados brutos</button></div>`,
+          sh => sh.querySelector('#dumpBtn').addEventListener('click', () => downloadText(`lamina-runica-dados-${stamp()}.txt`, rawDump())));
+      }
+      if (L.res.fixes.length) {
+        writeSafety('repair', L.text);                   // o original fica guardado antes de ser regravado
+        setTimeout(() => toast(`Alguns valores inválidos do save foram corrigidos (${L.res.fixes.join(', ')}). O original ficou guardado nas Configurações.`, 'bad'), 900);
+      }
+    } else if (L.kind === 'fresh') fresh = true;
+    else if (L.kind === 'future') pending = () => openFuture(L);
+    else pending = () => openRecovery(L);
+    if (L.kind === 'future') saveBlock = 'future';
+    if (L.kind === 'recover') saveBlock = 'recover';
+  }
+  if (!Store.backend) { storageOk = false; lastSaveError = 'unavailable'; }
   try { const t = localStorage.getItem('laminaRunica.tab'); if (TABS.some(x => x.id === t)) tab = t; } catch (e) {}
 
   buildTabs(); buildSkillBar(); bindEvents();
+  applyA11y(); syncMute();
   scene.resize();
   spawn(false);
 
-  if (!fresh && !(hotData && hotData.save)) {
-    const away = (Date.now() - S.lastSave) / 1000;
-    offlineGains(away, true);
+  if (!fresh && !hot && !saveBlock) {
+    const now = Date.now();
+    if (S.wallMax > now + 24 * 3600 * 1000) S.wallMax = now;           // horário registrado absurdo (relógio adiantado demais)
+    if (S.wallMax > now + 60000) setTimeout(() => toast('O relógio do aparelho voltou no tempo. O progresso offline volta a contar a partir do último horário registrado.', 'bad'), 1200);
+    const away = offlineSeconds(now, S.lastSave, S.wallMax);
+    if (away > 0) offlineGains(away, !pending);
+    save();                                                              // o período offline nunca é aplicado duas vezes
   }
-  if (fresh) {
+  if (!Store.backend) setTimeout(() => { toast('⚠ ' + SAVE_FAIL_TXT.unavailable, 'bad'); setSaveWarn('unavailable'); }, 800);
+  if (pending) pending();
+  else if (fresh) {
     dailyPrompted = false;
     openModal(`<h2>Lâmina Rúnica</h2>
       <p>Toque nos monstros para atacar. Derrote 10 monstros e enfrente o chefe antes que o tempo acabe.</p>
@@ -2716,7 +3562,9 @@ function start(hotData) {
     openDaily();
   }
   try { window.claude?.hot?.snapshot?.(() => ({ save: serialize() })); } catch (e) {}
-  if (location.hash === '#teste') window.__lr = { get S() { return S; }, spawnWisp, wispPos, get wisp() { return wisp; }, rollRarity, makeItem, grantItem, bossDrop, equipItem };
+  // Ganchos de teste: só existem com #teste no endereço. Não dão poder que o próprio navegador já não dê ao jogador.
+  if (location.hash === '#teste') window.__lr = { get S() { return S; }, spawnWisp, wispPos, get wisp() { return wisp; }, rollRarity, makeItem, grantItem, bossDrop, equipItem,
+    save, Session, Store, get saveBlock() { return saveBlock; }, get foe() { return foe; }, killFoe, bossEscaped, challengeBoss, prestige, salvageItem, claimQuest, claimDaily, claimAch, ACH, exportCode, tryImport, doTap };
   lastTick = performance.now();
   requestAnimationFrame(frame);
   cloudInit();
